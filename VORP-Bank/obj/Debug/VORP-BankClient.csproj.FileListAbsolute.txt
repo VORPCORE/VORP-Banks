@@ -1,0 +1,14 @@
+D:\VORP\VORP-Banks\VORP-Bank\bin\Debug\VORP-Bank.net.dll
+D:\VORP\VORP-Banks\VORP-Bank\bin\Debug\VORP-Bank.net.pdb
+D:\VORP\VORP-Banks\VORP-Bank\bin\Debug\CitizenFX.Core.dll
+D:\VORP\VORP-Banks\VORP-Bank\bin\Debug\System.Reflection.Metadata.dll
+D:\VORP\VORP-Banks\VORP-Bank\bin\Debug\System.Collections.Immutable.dll
+D:\VORP\VORP-Banks\VORP-Bank\bin\Debug\MsgPack.dll
+D:\VORP\VORP-Banks\VORP-Bank\bin\Debug\CitizenFX.Core.pdb
+D:\VORP\VORP-Banks\VORP-Bank\bin\Debug\CitizenFX.Core.xml
+D:\VORP\VORP-Banks\VORP-Bank\bin\Debug\MsgPack.xml
+D:\VORP\VORP-Banks\VORP-Bank\obj\Debug\VORP-BankClient.csprojAssemblyReference.cache
+D:\VORP\VORP-Banks\VORP-Bank\obj\Debug\VORP-BankClient.csproj.CoreCompileInputs.cache
+D:\VORP\VORP-Banks\VORP-Bank\obj\Debug\VORP-BankClient.csproj.CopyComplete
+D:\VORP\VORP-Banks\VORP-Bank\obj\Debug\VORP-Bank.net.dll
+D:\VORP\VORP-Banks\VORP-Bank\obj\Debug\VORP-Bank.net.pdb
