@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace VORP_BankServer
 {
-    class BankUser
+    public class BankUser
     {
         private string identifier;
         private double gold;

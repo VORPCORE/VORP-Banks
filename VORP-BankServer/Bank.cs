@@ -20,6 +20,14 @@ namespace VORP_BankServer
             this.gold = gold;
         }
 
+        public void addUser(BankUser user)
+        {
+            if (!this.bankUsers.ContainsKey(user.Identifier))
+            {
+                this.bankUsers.Add(user.Identifier,user);
+            }
+        }
+
         public bool addUserMoney(string identifier,double money){
             if(bankUsers.ContainsKey(identifier)){
                 double newMoney = bankUsers[identifier].getMoney()+money;
