@@ -26,11 +26,12 @@ namespace VORP_BankServer
             }
         }
 
-        public void addUser(BankUser user)
+        public void addUser(string identifier)
         {
+            BankUser user = new BankUser(identifier,0.0,0.0);
             if (!this.bankUsers.ContainsKey(user.Identifier))
             {
-                this.bankUsers.Add(user.Identifier,user);
+                this.bankUsers.Add(identifier,user);
             }
         }
 
@@ -38,6 +39,7 @@ namespace VORP_BankServer
             if(bankUsers.ContainsKey(identifier)){
                 double newMoney = bankUsers[identifier].getMoney()+money;
                 bankUsers[identifier].setMoney(newMoney);
+                this.money+= money;
                 return true;
             }else{
                 bankUsers.Add(identifier,new BankUser(identifier,0,money));
@@ -52,6 +54,7 @@ namespace VORP_BankServer
                     return false;
                 }else{
                     bankUsers[identifier].setMoney(nowMoney-money);
+                    this.money-= money;
                     return true;
                 }
             }else{
@@ -63,6 +66,7 @@ namespace VORP_BankServer
             if(bankUsers.ContainsKey(identifier)){
                 double newGold = bankUsers[identifier].getGold()+gold;
                 bankUsers[identifier].setMoney(newGold);
+                this.gold+= gold;
                 return true;
             }else{
                 bankUsers.Add(identifier,new BankUser(identifier,gold,0));
@@ -77,6 +81,7 @@ namespace VORP_BankServer
                     return false;
                 }else{
                     bankUsers[identifier].setMoney(nowGold-gold);
+                    this.gold-= gold;
                     return true;
                 }
             }else{

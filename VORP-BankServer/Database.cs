@@ -33,11 +33,6 @@ namespace VORP_BankServer
                                         aux.addUser(new BankUser(user.identifier.ToString(),double.Parse(user.gold.ToString()), double.Parse(user.money.ToString())));
                                     }
                                 }
-                                /*foreach (KeyValuePair<string, Bank> bank in Banks)
-                                {
-                                    Debug.WriteLine($"{bank.Key} Users:");
-                                    bank.Value.showUsers();
-                                }*/
                             }
                         }));
                     }
