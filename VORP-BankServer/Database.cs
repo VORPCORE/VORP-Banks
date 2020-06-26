@@ -14,28 +14,36 @@ namespace VORP_BankServer
         //TODO Get all users in each bank and create dictionary bank using database
         public Database(){
             //Create each bank
+            Debug.WriteLine("Cogiendo de la base de datos");
             Exports["ghmattimysql"].execute("SELECT * FROM banks", new Action<dynamic>((result) =>{
                 if(result != null){
                     foreach(var bank in result){
-                        Banks.Add(bank.name,new Bank(bank.name,bank.money,bank.gold));
+                        Banks.Add(bank.name.ToString(),new Bank(bank.name.ToString(),double.Parse(bank.money.ToString()),double.Parse(bank.gold.ToString())));
                     }
+                    if (Banks.Count > 0)
+                    {
+                        Exports["ghmattimysql"].execute("SELECT * FROM bank_users", new Action<dynamic>((aresult) => {
+                            if (aresult != null)
+                            {
+                                foreach (var user in aresult)
+                                {
+                                    if (Banks.ContainsKey(user.name.ToString()))
+                                    {
+                                        Bank aux = Banks[user.name.ToString()];
+                                        aux.addUser(new BankUser(user.identifier.ToString(),double.Parse(user.gold.ToString()), double.Parse(user.money.ToString())));
+                                    }
+                                }
+                                /*foreach (KeyValuePair<string, Bank> bank in Banks)
+                                {
+                                    Debug.WriteLine($"{bank.Key} Users:");
+                                    bank.Value.showUsers();
+                                }*/
+                            }
+                        }));
+                    }
+
                 }
             }));
-
-            if(Banks.Count > 0){
-                Exports["ghmattimysql"].execute("SELECT * FROM bank_users", new Action<dynamic>((result) =>{
-                if(result != null){
-                    foreach(var user in result){
-                        if (Banks.ContainsKey(user["name"]))
-                        {
-                            Bank aux = Banks[user["name"]];
-                            aux.addUser(new BankUser(user.identifier,double.Parse(user.gold), double.Parse(user.money)));
-                        }
-                    }
-                }
-                }));
-            }
-
         }
 
     }

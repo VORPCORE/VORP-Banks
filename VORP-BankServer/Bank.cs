@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using CitizenFX.Core;
 namespace VORP_BankServer
 {
-    public class Bank
+    public class Bank:BaseScript
     {
 
         private Dictionary<string,BankUser> bankUsers = new Dictionary<string, BankUser>();
@@ -18,6 +18,12 @@ namespace VORP_BankServer
             this.name = name;
             this.money = money;
             this.gold = gold;
+        }
+
+        public void showUsers(){
+            foreach(KeyValuePair<string,BankUser> user in bankUsers){
+                Debug.WriteLine(user.Key);
+            }
         }
 
         public void addUser(BankUser user)
