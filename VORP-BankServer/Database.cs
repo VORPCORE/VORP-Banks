@@ -8,5 +8,12 @@ namespace VORP_BankServer
 {
     class Database
     {
+        public static Dictionary<string,Bank> banks = new Dictionary<string, Bank>();
+        
+        //TODO Get all users in each bank and create dictionary bank using database
+        public Database(){
+
+        }
+
     }
 }
