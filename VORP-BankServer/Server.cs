@@ -15,6 +15,17 @@ namespace VORP_BankServer
             EventHandlers["vorp:addGold"] += new Action<Player,string,double>(addGold);
             EventHandlers["vorp:subGold"] += new Action<Player,string,double>(subGold);
             EventHandlers["vorp:registerUserInBank"] += new Action<Player,string>(registerUserInBank);
+            EventHandlers["vorp:retrieveUserInfo"] += new Action<Player,string>(retrieveUserInfo)
+        }
+
+        private void retrieveUserInfo([FromSource]Player source,string bank){
+            string identifier = "steam:"+source.Identifiers["steam"];
+            if(Database.Banks.ContainsKey(bank)){
+                if(Database.Banks[bank].GetUser(identifier) != null){
+                    source.TriggerEvent("giveUserInfo",Database.Banks[bank].GetUser(identifier).getGold(),
+                    Database.Banks[bank].GetUser(identifier).getMoney());
+                }
+            }
         }
 
         private void registerUserInBank([FromSource]Player source,string bank){

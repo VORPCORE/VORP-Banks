@@ -36,7 +36,6 @@ namespace VORP_BankServer
                             }
                         }));
                     }
-
                 }
             }));
         }
