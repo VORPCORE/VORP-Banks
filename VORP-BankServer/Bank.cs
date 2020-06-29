@@ -43,6 +43,10 @@ namespace VORP_BankServer
             }
         }
 
+        public bool userExist(string identifier){
+            return bankUsers.ContainsKey(identifier);
+        }
+
         public bool addUserMoney(string identifier,double money){
             if(bankUsers.ContainsKey(identifier)){
                 double newMoney = bankUsers[identifier].getMoney()+money;
