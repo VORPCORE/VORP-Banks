@@ -15,20 +15,26 @@ namespace VORP_BankServer
             EventHandlers["vorp:addGold"] += new Action<Player,string,double>(addGold);
             EventHandlers["vorp:subGold"] += new Action<Player,string,double>(subGold);
             EventHandlers["vorp:registerUserInBank"] += new Action<Player,string>(registerUserInBank);
-            EventHandlers["vorp:retrieveUserInfo"] += new Action<Player,string>(retrieveUserInfo);
+            EventHandlers["vorp:retrieveUserInfo"] += new Action<Player>(retrieveUserInfo);
         }
 
         //Only register when insert money in order to
-        private void retrieveUserInfo([FromSource]Player source,string bank){
+        private void retrieveUserInfo([FromSource]Player source){
             string identifier = "steam:"+source.Identifiers["steam"];
-            if(Database.Banks.ContainsKey(bank)){
-                if(Database.Banks[bank].GetUser(identifier) != null){
-                    source.TriggerEvent("vorp:giveUserInfo",Database.Banks[bank].GetUser(identifier).getGold(),
-                    Database.Banks[bank].GetUser(identifier).getMoney());
-                }else{
-                    source.TriggerEvent("vorp:giveUserInfo",0,0);
+            Dictionary<string,Dictionary<string,double>> userInfo = new Dictionary<string,Dictionary<string,double>>();
+            foreach (KeyValuePair<string,Bank> bank in Database.Banks)
+            {
+                if (bank.Value.userExist(identifier))
+                {
+                    userInfo.Add(bank.Key,new Dictionary<string, double>
+                    {
+                        {"money",bank.Value.GetUser(identifier).getMoney()},
+                        {"gold",bank.Value.GetUser(identifier).getGold()}
+                    });
                 }
             }
+
+            source.TriggerEvent("vorp:giveUserInfo",userInfo);
         }
 
         private void registerUserInBank([FromSource]Player source,string bank){
