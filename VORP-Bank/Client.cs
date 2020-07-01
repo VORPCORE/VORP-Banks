@@ -11,6 +11,7 @@ namespace VORP_BankClient
 {
     public class Main:BaseScript
     {
+        private bool InBank = false;
         public Main()
         {
             Tick += onBank;
@@ -26,25 +27,34 @@ namespace VORP_BankClient
                 if (API.GetDistanceBetweenCoords(util.Value.X, util.Value.Y, util.Value.Z, playerCoords.X,
                     playerCoords.Y, playerCoords.Z, false) <= 1.0f)
                 {
-                    await DrawTxt("Presiona para hablar con el bankero", 0.5f, 0.9f, 0.7f, 0.7f, 355, 255, 255, 255,
+                    await Utils.DrawTxt("Presiona para hablar con el bankero", 0.5f, 0.9f, 0.7f, 0.7f, 355, 255, 255, 255,
                         true, true);
                     if (API.IsControlJustPressed(2, 0xD9D0E1C0))
                     {
-                        //Abrir el menú del banco correspondiente
+                        if (InBank)
+                        {
+                            await CloseBank();
+                        }
+                        else
+                        {
+                            await OpenBank();
+                        }
                     }
                 }
             }
         }
 
-        public async Task DrawTxt(string text, float x, float y, float fontscale, float fontsize, int r, int g, int b, int alpha, bool textcentred, bool shadow)
+        private async Task OpenBank()
         {
-            long str = Function.Call<long>(Hash._CREATE_VAR_STRING, 10, "LITERAL_STRING", text);
-            Function.Call(Hash.SET_TEXT_SCALE, fontscale, fontsize);
-            Function.Call(Hash._SET_TEXT_COLOR, r, g, b, alpha);
-            Function.Call(Hash.SET_TEXT_CENTRE, textcentred);
-            if (shadow) { Function.Call(Hash.SET_TEXT_DROPSHADOW, 1, 0, 0, 255); }
-            Function.Call(Hash.SET_TEXT_FONT_FOR_CURRENT_COMMAND, 1);
-            Function.Call(Hash._DISPLAY_TEXT, str, x, y);
+            API.SetNuiFocus(true,true);
+            API.SendNuiMessage("{\"action\":\"display\"}");
+            InBank = true;
+        }
+
+        private async Task CloseBank()
+        {
+            API.SetNuiFocus(false,false);
+            API.SendNuiMessage("{\"action\": \"hide\"}");
         }
 
     }
