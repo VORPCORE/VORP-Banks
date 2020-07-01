@@ -26,7 +26,7 @@ namespace VORP_BankServer
                     source.TriggerEvent("vorp:giveUserInfo",Database.Banks[bank].GetUser(identifier).getGold(),
                     Database.Banks[bank].GetUser(identifier).getMoney());
                 }else{
-                    source.TriggerEvent("vorp:giveUserInfo",0,0);
+                    source.TriggerEvent("vorp:giveUserInfo",0.0,0.0);
                 }
             }
         }

@@ -14,7 +14,17 @@ namespace VORP_BankClient
         private bool InBank = false;
         public Main()
         {
+            EventHandlers["onClientResourceStart"] += new Action<string>(OnClientResourceStart);
+            EventHandlers["vorp:giveUserInfo"] += new Action<double,double>(getUserInfo);
             Tick += onBank;
+        }
+
+        private async void OnClientResourceStart(string resourceName)
+        {
+            if (API.GetCurrentResourceName() != resourceName) return;
+            API.SetNuiFocus(false, false);
+            API.SendNuiMessage("{\"action\": \"hide\"}");
+            Debug.WriteLine("Loading banks where user is registered");
         }
 
 
@@ -31,24 +41,23 @@ namespace VORP_BankClient
                         true, true);
                     if (API.IsControlJustPressed(2, 0xD9D0E1C0))
                     {
-                        if (InBank)
-                        {
-                            await CloseBank();
-                        }
-                        else
-                        {
-                            await OpenBank();
-                        }
+                        await OpenBank(util.Key);
                     }
                 }
             }
         }
 
-        private async Task OpenBank()
+        private async Task OpenBank(string bank)
         {
             API.SetNuiFocus(true,true);
             API.SendNuiMessage("{\"action\":\"display\"}");
             InBank = true;
+            TriggerServerEvent("vorp:retrieveUserInfo",bank);
+        }
+
+        private void getUserInfo(double gold, double money)
+        {
+
         }
 
         private async Task CloseBank()
