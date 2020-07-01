@@ -14,23 +14,7 @@ namespace VORP_BankClient
         private bool InBank = false;
         public Main()
         {
-            EventHandlers["onClientResourceStart"] += new Action<string>(OnClientResourceStart);
-            EventHandlers["vorp:giveUserInfo"] += new Action<dynamic>(getUserInfo);
             Tick += onBank;
-        }
-
-        private async void getUserInfo(dynamic userInfo)
-        {
-
-        }
-
-        private async void OnClientResourceStart(string resourceName)
-        {
-            if (API.GetCurrentResourceName() != resourceName) return;
-            API.SetNuiFocus(false,false);
-            API.SendNuiMessage("{\"action\": \"hide\"}");
-            Debug.WriteLine("Loading banks where user is registered");
-            TriggerServerEvent("vorp:retrieveUserInfo");
         }
 
 
