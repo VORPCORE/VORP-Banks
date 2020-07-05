@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +17,8 @@ namespace VORP_BankClient
         {
             EventHandlers["onClientResourceStart"] += new Action<string>(OnClientResourceStart);
             EventHandlers["vorp:giveUserInfo"] += new Action<double,double>(getUserInfo);
+            API.RegisterNuiCallbackType("NUIFocusOff");
+            EventHandlers["__cfx_nui:NUIFocusOff"] += new Action<ExpandoObject>(CloseBank);
             Tick += onBank;
         }
 
@@ -55,12 +58,12 @@ namespace VORP_BankClient
             TriggerServerEvent("vorp:retrieveUserInfo",bank);
         }
 
-        private void getUserInfo(double gold, double money)
+        private async void getUserInfo(double gold, double money)
         {
-
+            API.SendNuiMessage($"")
         }
 
-        private async Task CloseBank()
+        private void CloseBank(ExpandoObject obj)
         {
             API.SetNuiFocus(false,false);
             API.SendNuiMessage("{\"action\": \"hide\"}");
