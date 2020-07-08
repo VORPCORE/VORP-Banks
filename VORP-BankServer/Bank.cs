@@ -13,6 +13,7 @@ namespace VORP_BankServer
         private string name;
         private double money;
         private double gold;
+      
         public Bank(string name, double money, double gold)
         {
             this.name = name;

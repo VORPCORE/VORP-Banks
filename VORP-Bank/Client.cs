@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
+using Newtonsoft.Json.Linq;
 using VORP_Bank;
 
 namespace VORP_BankClient
@@ -18,7 +19,6 @@ namespace VORP_BankClient
             EventHandlers["onClientResourceStart"] += new Action<string>(OnClientResourceStart);
             EventHandlers["vorp:giveUserInfo"] += new Action<double,double>(getUserInfo);
             API.RegisterNuiCallbackType("NUIFocusOff");
-            EventHandlers["__cfx_nui:NUIFocusOff"] += new Action<ExpandoObject>(CloseBank);
             Tick += onBank;
         }
 
@@ -52,15 +52,22 @@ namespace VORP_BankClient
 
         private async Task OpenBank(string bank)
         {
-            API.SetNuiFocus(true,true);
-            API.SendNuiMessage("{\"action\":\"display\"}");
             InBank = true;
-            TriggerServerEvent("vorp:retrieveUserInfo",bank);
+            TriggerEvent("vorp:triggerServerCallBack", "retrieveUserBankInfo", new Action<dynamic>((args) =>
+            {
+                JObject data = new JObject();
+                data.Add("action", "showAccount");
+                data.Add("bank", bank); //Normalmente cuando hagas el archivo de traduccion recuerda poner los nobmres de los bancos rollo Saint Denis Bank
+                data.Add("money",args[1]);
+                data.Add("gold", args[0]);
+                API.SendNuiMessage(data.ToString());
+                API.SetNuiFocus(true, true);
+            }),bank);
         }
 
         private async void getUserInfo(double gold, double money)
         {
-            API.SendNuiMessage($"")
+            API.SendNuiMessage($"");
         }
 
         private void CloseBank(ExpandoObject obj)
