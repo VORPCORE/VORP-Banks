@@ -27,7 +27,15 @@ namespace VORP_BankServer
             }
         }
 
-        public void addUser(string identifier)
+        public void addUser(BankUser user)
+        {
+            if (!this.bankUsers.ContainsKey(user.Identifier))
+            {
+                this.bankUsers.Add(user.Identifier, user);
+            }
+        }
+
+        public void addNewUser(string identifier)
         {
             BankUser user = new BankUser(identifier,0.0,0.0);
             if (!this.bankUsers.ContainsKey(user.Identifier))

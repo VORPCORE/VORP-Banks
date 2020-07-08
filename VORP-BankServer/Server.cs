@@ -11,9 +11,7 @@ namespace VORP_BankServer
         public Server()
         {
             EventHandlers["vorp:addMoney"] += new Action<Player,string,double>(addMoney);
-            EventHandlers["vorp:subMoney"] += new Action<Player,string,double>(subMoney);
             EventHandlers["vorp:addGold"] += new Action<Player,string,double>(addGold);
-            EventHandlers["vorp:subGold"] += new Action<Player,string,double>(subGold);
             EventHandlers["vorp:registerUserInBank"] += new Action<Player,string>(registerUserInBank);
             Delay(100);
             RegisterEvents();
@@ -40,6 +38,8 @@ namespace VORP_BankServer
                 }
             }));
 
+            Delay(100);
+
             TriggerEvent("vorp:addNewCallBack", "bankSubMoney", new Action<int, CallbackDelegate, dynamic>((source, cb, args) => {
                 PlayerList pl = new PlayerList();
                 Player p = pl[source];
@@ -58,6 +58,8 @@ namespace VORP_BankServer
                     cb(false);
                 }
             }));
+
+            Delay(100);
 
             TriggerEvent("vorp:addNewCallBack", "bankSubGold", new Action<int, CallbackDelegate, dynamic>((source, cb, args) => {
                 PlayerList pl = new PlayerList();
@@ -82,7 +84,7 @@ namespace VORP_BankServer
         private void registerUserInBank([FromSource]Player source,string bank){
             string identifier = "steam:"+source.Identifiers["steam"];
             if(Database.Banks.ContainsKey(bank)){
-                Database.Banks[bank].addUser(identifier);
+                Database.Banks[bank].addNewUser(identifier);
             }
         }
 
@@ -92,7 +94,7 @@ namespace VORP_BankServer
                 if(Database.Banks[bank].userExist(identifier)){
                     Database.Banks[bank].addUserMoney(identifier,cuantity);
                 }else{
-                    Database.Banks[bank].addUser(identifier);
+                    Database.Banks[bank].addNewUser(identifier);
                     Database.Banks[bank].addUserMoney(identifier,cuantity);
                 }  
             }
@@ -104,17 +106,9 @@ namespace VORP_BankServer
                 if(Database.Banks[bank].userExist(identifier)){
                     Database.Banks[bank].addUserGold(identifier,cuantity);
                 }else{
-                    Database.Banks[bank].addUser(identifier);
+                    Database.Banks[bank].addNewUser(identifier);
                     Database.Banks[bank].addUserGold(identifier,cuantity);
                 }  
-            }
-        }
-
-        private void subGold([FromSource]Player source,string bank,double cuantity){
-            string identifier = "steam:" + source.Identifiers["steam"];
-            if(Database.Banks.ContainsKey(bank)){
-                if(Database.Banks[bank].userExist(identifier))
-                    Database.Banks[bank].subUserGold(identifier,cuantity);
             }
         }
     }

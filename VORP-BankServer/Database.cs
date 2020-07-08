@@ -19,19 +19,26 @@ namespace VORP_BankServer
                 if(result != null){
                     foreach(var bank in result){
                         Banks.Add(bank.name.ToString(),new Bank(bank.name.ToString(),double.Parse(bank.money.ToString()),double.Parse(bank.gold.ToString())));
+                        Debug.WriteLine($"Added :{bank.name} with {bank.money} money and {bank.gold} gold");
                     }
                     if (Banks.Count > 0)
                     {
                         Exports["ghmattimysql"].execute("SELECT * FROM bank_users", new Action<dynamic>((aresult) => {
                             if (aresult != null)
                             {
-                                foreach (var user in aresult)
+                                foreach (dynamic user in aresult)
                                 {
-                                    if (Banks.ContainsKey(user.name.ToString()))
+                                    foreach(dynamic i in user)
                                     {
-                                        Bank aux = Banks[user.name.ToString()];
-                                        aux.addUser(new BankUser(user.identifier.ToString(),double.Parse(user.gold.ToString()), double.Parse(user.money.ToString())));
+                                        Debug.WriteLine(i.ToString());
                                     }
+                                    /*if (Banks.ContainsKey(user.name.ToString()))
+                                    {
+                                        Debug.WriteLine($"{user.identifier}");
+                                        //Bank aux = Banks[user.name.ToString()];
+                                        //Debug.WriteLine(aux.getName());
+                                        //aux.addUser(new BankUser(user.identifier.ToString(),double.Parse(user.gold.ToString()), double.Parse(user.money.ToString())));
+                                    }*/
                                 }
                             }
                         }));
