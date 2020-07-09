@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-
+/*PROPERTY OF KLS_BY AVILILLA*/
 namespace VORP_Bank
 {
     class NuiControl:BaseScript

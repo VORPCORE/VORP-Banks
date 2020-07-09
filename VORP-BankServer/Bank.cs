@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CitizenFX.Core;
+/*PROPERTY OF KLS_BY AVILILLA*/
 namespace VORP_BankServer
 {
     public class Bank:BaseScript
