@@ -84,18 +84,18 @@ namespace VORP_BankServer
         private void registerUserInBank([FromSource]Player source,string bank){
             string identifier = "steam:"+source.Identifiers["steam"];
             if(Database.Banks.ContainsKey(bank)){
-                Database.Banks[bank].addNewUser(identifier);
+                Database.Banks[bank].AddNewUser(identifier);
             }
         }
 
         private void addMoney([FromSource]Player source,string bank,double cuantity){
             string identifier = "steam:" + source.Identifiers["steam"];
             if(Database.Banks.ContainsKey(bank)){
-                if(Database.Banks[bank].userExist(identifier)){
-                    Database.Banks[bank].addUserMoney(identifier,cuantity);
+                if(Database.Banks[bank].UserExist(identifier)){
+                    Database.Banks[bank].AddUserMoney(identifier,cuantity);
                 }else{
-                    Database.Banks[bank].addNewUser(identifier);
-                    Database.Banks[bank].addUserMoney(identifier,cuantity);
+                    Database.Banks[bank].AddNewUser(identifier);
+                    Database.Banks[bank].AddUserMoney(identifier,cuantity);
                 }  
             }
         }
@@ -103,11 +103,11 @@ namespace VORP_BankServer
         private void addGold([FromSource]Player source,string bank,double cuantity){
             string identifier = "steam:" + source.Identifiers["steam"];
             if(Database.Banks.ContainsKey(bank)){
-                if(Database.Banks[bank].userExist(identifier)){
-                    Database.Banks[bank].addUserGold(identifier,cuantity);
+                if(Database.Banks[bank].UserExist(identifier)){
+                    Database.Banks[bank].AddUserGold(identifier,cuantity);
                 }else{
-                    Database.Banks[bank].addNewUser(identifier);
-                    Database.Banks[bank].addUserGold(identifier,cuantity);
+                    Database.Banks[bank].AddNewUser(identifier);
+                    Database.Banks[bank].AddUserGold(identifier,cuantity);
                 }  
             }
         }

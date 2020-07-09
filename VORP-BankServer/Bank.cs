@@ -10,24 +10,24 @@ namespace VORP_BankServer
     {
 
         private Dictionary<string,BankUser> bankUsers = new Dictionary<string, BankUser>();
-        private string name;
-        private double money;
-        private double gold;
+        private string _name;
+        private double _money;
+        private double _gold;
       
         public Bank(string name, double money, double gold)
         {
-            this.name = name;
-            this.money = money;
-            this.gold = gold;
+            this._name = name;
+            this._money = money;
+            this._gold = gold;
         }
 
-        public void showUsers(){
+        public void ShowUsers(){
             foreach(KeyValuePair<string,BankUser> user in bankUsers){
                 Debug.WriteLine(user.Key);
             }
         }
 
-        public void addUser(BankUser user)
+        public void AddUser(BankUser user)
         {
             if (!this.bankUsers.ContainsKey(user.Identifier))
             {
@@ -35,7 +35,7 @@ namespace VORP_BankServer
             }
         }
 
-        public void addNewUser(string identifier)
+        public void AddNewUser(string identifier)
         {
             BankUser user = new BankUser(identifier,0.0,0.0);
             if (!this.bankUsers.ContainsKey(user.Identifier))
@@ -52,15 +52,15 @@ namespace VORP_BankServer
             }
         }
 
-        public bool userExist(string identifier){
+        public bool UserExist(string identifier){
             return bankUsers.ContainsKey(identifier);
         }
 
-        public bool addUserMoney(string identifier,double money){
+        public bool AddUserMoney(string identifier,double money){
             if(bankUsers.ContainsKey(identifier)){
-                double newMoney = bankUsers[identifier].getMoney()+money;
-                bankUsers[identifier].setMoney(newMoney);
-                this.money+= money;
+                double newMoney = bankUsers[identifier].GetMoney()+money;
+                bankUsers[identifier].SetMoney(newMoney);
+                this._money+= money;
                 return true;
             }else{
                 bankUsers.Add(identifier,new BankUser(identifier,0,money));
@@ -68,14 +68,14 @@ namespace VORP_BankServer
             }
         }
 
-        public bool subUserMoney(string identifier,double money){
+        public bool SubUserMoney(string identifier,double money){
             if(bankUsers.ContainsKey(identifier)){
-                double nowMoney = bankUsers[identifier].getMoney();
+                double nowMoney = bankUsers[identifier].GetMoney();
                 if(nowMoney-money < 0.0){
                     return false;
                 }else{
-                    bankUsers[identifier].setMoney(nowMoney-money);
-                    this.money-= money;
+                    bankUsers[identifier].SetMoney(nowMoney-money);
+                    this._money-= money;
                     return true;
                 }
             }else{
@@ -83,11 +83,11 @@ namespace VORP_BankServer
             }
         }
 
-        public bool addUserGold(string identifier,double gold){
+        public bool AddUserGold(string identifier,double gold){
             if(bankUsers.ContainsKey(identifier)){
-                double newGold = bankUsers[identifier].getGold()+gold;
-                bankUsers[identifier].setMoney(newGold);
-                this.gold+= gold;
+                double newGold = bankUsers[identifier].GetGold()+gold;
+                bankUsers[identifier].SetMoney(newGold);
+                this._gold+= gold;
                 return true;
             }else{
                 bankUsers.Add(identifier,new BankUser(identifier,gold,0));
@@ -95,14 +95,14 @@ namespace VORP_BankServer
             }
         }
 
-        public bool subUserGold(string identifier,double gold){
+        public bool SubUserGold(string identifier,double gold){
             if(bankUsers.ContainsKey(identifier)){
-                double nowGold = bankUsers[identifier].getGold();
+                double nowGold = bankUsers[identifier].GetGold();
                 if(nowGold-gold < 0.0){
                     return false;
                 }else{
-                    bankUsers[identifier].setMoney(nowGold-gold);
-                    this.gold-= gold;
+                    bankUsers[identifier].SetMoney(nowGold-gold);
+                    this._gold-= gold;
                     return true;
                 }
             }else{
@@ -110,34 +110,34 @@ namespace VORP_BankServer
             }
         }
 
-        public string getName()
+        public string GetName()
         {
-            return this.name;
+            return this._name;
         }
 
-        public void setName(string name)
+        public void SetName(string name)
         {
-            this.name = name;
+            this._name = name;
         }
 
-        public double getMoney()
+        public double GetMoney()
         {
-            return this.money;
+            return this._money;
         }
 
-        public void setMoney(double money)
+        public void SetMoney(double money)
         {
-            this.money = money;
+            this._money = money;
         }
 
-        public double getGold()
+        public double GetGold()
         {
-            return this.gold;
+            return this._gold;
         }
 
-        public void setGold(double gold)
+        public void SetGold(double gold)
         {
-            this.gold = gold;
+            this._gold = gold;
         }
     }
 }

@@ -9,43 +9,43 @@ namespace VORP_BankServer
 {
     public class BankUser
     {
-        private string identifier;
-        private double gold;
-        private double money;
+        private string _identifier;
+        private double _gold;
+        private double _money;
 
         public BankUser(string identifier,double gold,double money)
         {
-            this.gold = gold;
-            this.identifier = identifier;
-            this.money = money;
+            this._gold = gold;
+            this._identifier = identifier;
+            this._money = money;
         }
 
         public string Identifier
         {
-            get => identifier;
+            get => _identifier;
             set
             {
                 if (value != null)
                 {
-                    identifier = value;
+                    _identifier = value;
                 }
             }
         }
 
-        public double getMoney(){
-            return this.money;
+        public double GetMoney(){
+            return this._money;
         }
 
-        public void setMoney(double money){
-            this.money = money;
+        public void SetMoney(double money){
+            this._money = money;
         }
 
-        public double getGold(){
-            return this.gold;
+        public double GetGold(){
+            return this._gold;
         }
 
-        public void setGold(double gold){
-            this.gold = gold;
+        public void SetGold(double gold){
+            this._gold = gold;
         }
     }
 }
