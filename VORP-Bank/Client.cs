@@ -18,8 +18,7 @@ namespace VORP_BankClient
         {
             EventHandlers["onClientResourceStart"] += new Action<string>(OnClientResourceStart);
             EventHandlers["vorp:giveUserInfo"] += new Action<double,double>(getUserInfo);
-            API.RegisterNuiCallbackType("NUIFocusOff");
-            Tick += onBank;
+            Tick += OnBank;
         }
 
         private async void OnClientResourceStart(string resourceName)
@@ -32,7 +31,7 @@ namespace VORP_BankClient
 
 
         [Tick]
-        private async Task onBank()
+        private async Task OnBank()
         {
             Vector3 playerCoords = API.GetEntityCoords(API.PlayerPedId(), true, true);
             foreach (KeyValuePair<string,Vector3> util in Utils.bankPositions)
@@ -42,7 +41,7 @@ namespace VORP_BankClient
                 {
                     await Utils.DrawTxt("Presiona para hablar con el bankero", 0.5f, 0.9f, 0.7f, 0.7f, 355, 255, 255, 255,
                         true, true);
-                    if (API.IsControlJustPressed(2, 0xD9D0E1C0))
+                    if (API.IsControlJustPressed(0, 0x760A9C6F))
                     {
                         await OpenBank(util.Key);
                     }

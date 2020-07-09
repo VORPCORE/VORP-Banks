@@ -28,10 +28,13 @@ namespace VORP_BankServer
                             {
                                 foreach (dynamic user in aresult)
                                 {
-                                    if (Banks.ContainsKey(user.name.ToString()))
+                                    if (user != null)
                                     {
-                                        Bank aux = Banks[user.name.ToString()];
-                                        aux.AddUser(new BankUser(user.identifier.ToString(),double.Parse(user.gold.ToString()), double.Parse(user.money.ToString())));
+                                        if (Banks.ContainsKey(user.name.ToString()))
+                                        {
+                                            Bank aux = Banks[user.name.ToString()];
+                                            aux.AddUser(new BankUser(user.identifier.ToString(),double.Parse(user.gold.ToString()), double.Parse(user.money.ToString())));
+                                        }
                                     }
                                 }
                             }
