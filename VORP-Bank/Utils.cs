@@ -15,7 +15,6 @@ namespace VORP_Bank
         {
             {"SAINTDENIS",new Vector3(-341.07f,767.35f,116.71f)}
         };
-
         public Utils(){}
 
         public static async Task DrawTxt(string text, float x, float y, float fontscale, float fontsize, int r, int g, int b, int alpha, bool textcentred, bool shadow)

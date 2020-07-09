@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GetConfig.cs" />
     <Compile Include="NuiControl.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Client.cs" />

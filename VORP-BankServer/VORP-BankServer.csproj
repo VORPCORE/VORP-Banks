@@ -47,6 +47,7 @@
     <Compile Include="Bank.cs" />
     <Compile Include="BankUser.cs" />
     <Compile Include="Database.cs" />
+    <Compile Include="LoadConfig.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
