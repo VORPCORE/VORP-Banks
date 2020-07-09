@@ -54,11 +54,12 @@ namespace VORP_BankClient
             InBank = true;
             TriggerEvent("vorp:triggerServerCallBack", "retrieveUserBankInfo", new Action<dynamic>((args) =>
             {
+                Debug.WriteLine(bank);
                 JObject data = new JObject();
                 data.Add("action", "showAccount");
                 data.Add("bank", bank); //Normalmente cuando hagas el archivo de traduccion recuerda poner los nobmres de los bancos rollo Saint Denis Bank
-                data.Add("money",args[1]);
-                data.Add("gold", args[0]);
+                data.Add("money",double.Parse(args.money.ToString()));
+                data.Add("gold", double.Parse(args.gold.ToString()));
                 API.SendNuiMessage(data.ToString());
                 API.SetNuiFocus(true, true);
             }),bank);

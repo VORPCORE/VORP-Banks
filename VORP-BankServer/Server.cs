@@ -27,13 +27,18 @@ namespace VORP_BankServer
                 string identifier = "steam:" + p.Identifiers["steam"];
                 if (Database.Banks.ContainsKey(args))
                 {
+                    Dictionary<string,double> userCallback = new Dictionary<string, double>(); 
                     if (Database.Banks[args].GetUser(identifier) != null)
                     {
-                        cb(Database.Banks[args].GetUser(identifier).GetGold(), Database.Banks[args].GetUser(identifier).GetMoney());
+                        userCallback.Add("money",Database.Banks[args].GetUser(identifier).GetMoney());
+                        userCallback.Add("gold",Database.Banks[args].GetUser(identifier).GetGold());
+                        cb(userCallback);
                     }
                     else
                     {
-                        cb(0.0, 0.0);
+                        userCallback.Add("money",0.0);
+                        userCallback.Add("gold",0.0);
+                        cb(userCallback);
                     }
                 }
             }));
