@@ -39,9 +39,9 @@ namespace VORP_BankClient
                 if (API.GetDistanceBetweenCoords(util.Value.X, util.Value.Y, util.Value.Z, playerCoords.X,
                     playerCoords.Y, playerCoords.Z, false) <= 1.0f)
                 {
-                    await Utils.DrawTxt("Presiona para hablar con el bankero", 0.5f, 0.9f, 0.7f, 0.7f, 355, 255, 255, 255,
+                    await Utils.DrawTxt("Presiona Espacio para hablar con el bankero", 0.5f, 0.9f, 0.7f, 0.7f, 355, 255, 255, 255,
                         true, true);
-                    if (API.IsControlJustPressed(0, 0x760A9C6F))
+                    if (API.IsControlJustPressed(2, 0xD9D0E1C0))
                     {
                         await OpenBank(util.Key);
                     }

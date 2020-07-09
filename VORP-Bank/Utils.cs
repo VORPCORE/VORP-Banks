@@ -13,7 +13,7 @@ namespace VORP_Bank
         //Posicion 
         public static Dictionary<string,Vector3> bankPositions= new Dictionary<string,Vector3>()
         {
-            {"valentine",new Vector3(-341.07f,767.35f,116.71f)}
+            {"SaintDenis",new Vector3(-341.07f,767.35f,116.71f)}
         };
 
         public Utils(){}

@@ -23,6 +23,7 @@ namespace VORP_BankServer
                     }
                     if (Banks.Count > 0)
                     {
+                        Delay(500);
                         Exports["ghmattimysql"].execute("SELECT * FROM bank_users", new Action<dynamic>((aresult) => {
                             if (aresult != null)
                             {

@@ -29,7 +29,7 @@ namespace VORP_BankServer
                 {
                     if (Database.Banks[args].GetUser(identifier) != null)
                     {
-                        cb(Database.Banks[args].GetUser(identifier).getGold(), Database.Banks[args].GetUser(identifier).getMoney());
+                        cb(Database.Banks[args].GetUser(identifier).GetGold(), Database.Banks[args].GetUser(identifier).GetMoney());
                     }
                     else
                     {
@@ -46,9 +46,9 @@ namespace VORP_BankServer
                 string identifier = "steam:" + p.Identifiers["steam"];
                 if (Database.Banks.ContainsKey(args.bank))
                 {
-                    if (Database.Banks[args.bank].userExist(identifier))
+                    if (Database.Banks[args.bank].UserExist(identifier))
                     {
-                        cb(Database.Banks[args.bank].subUserMoney(identifier, args.cuantity));
+                        cb(Database.Banks[args.bank].SubUserMoney(identifier, args.cuantity));
                     }
                     cb(false);
 
@@ -67,9 +67,9 @@ namespace VORP_BankServer
                 string identifier = "steam:" + p.Identifiers["steam"];
                 if (Database.Banks.ContainsKey(args.bank))
                 {
-                    if (Database.Banks[args.bank].userExist(identifier))
+                    if (Database.Banks[args.bank].UserExist(identifier))
                     {
-                        cb(Database.Banks[args.bank].subUserGold(identifier, args.cuantity));
+                        cb(Database.Banks[args.bank].SubUserGold(identifier, args.cuantity));
                     }
                     cb(false);
 
