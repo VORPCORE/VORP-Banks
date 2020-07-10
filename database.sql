@@ -27,10 +27,12 @@ CREATE TABLE `transactions` (
 	`toIdentifier` VARCHAR(50) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
 	`quantity` DOUBLE(22,0) NULL DEFAULT NULL,
 	`date` DATE NULL DEFAULT NULL,
+	`reason` VARCHAR(100) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
 	INDEX `FK_transactions_banks` (`bank`) USING BTREE,
 	CONSTRAINT `FK_transactions_banks` FOREIGN KEY (`bank`) REFERENCES `vorp`.`banks` (`name`) ON UPDATE CASCADE ON DELETE CASCADE
 )
 COLLATE='utf8mb4_general_ci'
 ENGINE=InnoDB
 ;
+
 

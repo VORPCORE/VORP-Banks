@@ -11,12 +11,12 @@ namespace VORP_Bank
     public class Utils:BaseScript
     {
         //Posicion 
-        public static Dictionary<string,Vector3> bankPositions= new Dictionary<string,Vector3>()
-        {
-            {"SAINTDENIS",new Vector3(-341.07f,767.35f,116.71f)}
-        };
+        // public static Dictionary<string,Vector3> bankPositions= new Dictionary<string,Vector3>()
+        // {
+        //     {"SAINTDENIS",new Vector3(-341.07f,767.35f,116.71f)}
+        // };
         public Utils(){}
-
+    
         public static async Task DrawTxt(string text, float x, float y, float fontscale, float fontsize, int r, int g, int b, int alpha, bool textcentred, bool shadow)
         {
             long str = Function.Call<long>(Hash._CREATE_VAR_STRING, 10, "LITERAL_STRING", text);

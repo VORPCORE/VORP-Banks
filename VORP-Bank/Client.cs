@@ -14,6 +14,7 @@ namespace VORP_BankClient
     public class Main:BaseScript
     {
         private bool InBank = false;
+        private string UsedBank;
         public Main()
         {
             EventHandlers["onClientResourceStart"] += new Action<string>(OnClientResourceStart);
@@ -33,23 +34,25 @@ namespace VORP_BankClient
         [Tick]
         private async Task OnBank()
         {
+            if (!GetConfig.IsLoaded) return;
+            
             Vector3 playerCoords = API.GetEntityCoords(API.PlayerPedId(), true, true);
-            foreach (KeyValuePair<string,Vector3> util in Utils.bankPositions)
+            foreach (JToken util in GetConfig.Config["Banks"])
             {
-                if (API.GetDistanceBetweenCoords(util.Value.X, util.Value.Y, util.Value.Z, playerCoords.X,
+                if (API.GetDistanceBetweenCoords(util["coords"]["x"].ToObject<float>(), util["coords"]["y"].ToObject<float>(), util["coords"]["z"].ToObject<float>(), playerCoords.X,
                     playerCoords.Y, playerCoords.Z, false) <= 1.0f)
                 {
                     await Utils.DrawTxt("Presiona Espacio para hablar con el bankero", 0.5f, 0.9f, 0.7f, 0.7f, 355, 255, 255, 255,
                         true, true);
                     if (API.IsControlJustPressed(2, 0xD9D0E1C0))
                     {
-                        await OpenBank(util.Key);
+                        await OpenBank(util["name"].ToString(),util["hudName"].ToString());
                     }
                 }
             }
         }
 
-        private async Task OpenBank(string bank)
+        private async Task OpenBank(string bank,string hudname)
         {
             InBank = true;
             TriggerEvent("vorp:triggerServerCallBack", "retrieveUserBankInfo", new Action<dynamic>((args) =>
@@ -57,11 +60,12 @@ namespace VORP_BankClient
                 Debug.WriteLine(bank);
                 JObject data = new JObject();
                 data.Add("action", "showAccount");
-                data.Add("bank", bank); //Normalmente cuando hagas el archivo de traduccion recuerda poner los nobmres de los bancos rollo Saint Denis Bank
+                data.Add("bank",hudname); //Normalmente cuando hagas el archivo de traduccion recuerda poner los nobmres de los bancos rollo Saint Denis Bank
                 data.Add("money",double.Parse(args.money.ToString()));
                 data.Add("gold", double.Parse(args.gold.ToString()));
                 API.SendNuiMessage(data.ToString());
                 API.SetNuiFocus(true, true);
+                UsedBank = bank;
             }),bank);
         }
 

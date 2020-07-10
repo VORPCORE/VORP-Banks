@@ -1,0 +1,11 @@
+﻿{
+  "Banks": [
+    {
+      "name": "SaintDenis", //No tocar
+      "hudName":"SAINT DENIS",
+      "blipName": "Saint Denis",
+      "blipHash": -2128054417,
+      "coords": {"x": -341.07,"y": 767.35 ,"z": 116.71}
+    }
+  ]
+}
