@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
-/*PROPERTY OF KLS_BY AVILILLA*/
+/*PROPERTY OF KLC_BY AVILILLA*/
 namespace VORP_Bank
 {
     public class Utils:BaseScript

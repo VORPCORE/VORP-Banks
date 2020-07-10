@@ -8,7 +8,7 @@ using CitizenFX.Core;
 using CitizenFX.Core.Native;
 using Newtonsoft.Json.Linq;
 using VORP_Bank;
-/*PROPERTY OF KLS_BY AVILILLA*/
+/*PROPERTY OF KLC_BY AVILILLA*/
 namespace VORP_BankClient
 {
     public class Main:BaseScript

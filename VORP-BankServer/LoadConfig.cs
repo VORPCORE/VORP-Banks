@@ -1,7 +1,7 @@
 ﻿using System;
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
-
+/*PROPERTY OF KLC_BY AVILILLA*/
 namespace VORP_BankServer
 {
     public class LoadConfig:BaseScript

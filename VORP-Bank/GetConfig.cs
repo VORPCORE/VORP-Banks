@@ -4,7 +4,7 @@ using System.Dynamic;
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
 using Newtonsoft.Json.Linq;
-
+/*PROPERTY OF KLC_BY AVILILLA*/
 namespace VORP_Bank
 {
     public class GetConfig:BaseScript
