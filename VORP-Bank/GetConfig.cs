@@ -28,7 +28,7 @@ namespace VORP_Bank
             {
                 Langs[l.Key] = l.Value.ToString();
             }
-
+            Utils.CreateBlips(Config["Banks"]);
             IsLoaded = true;
         }
     }

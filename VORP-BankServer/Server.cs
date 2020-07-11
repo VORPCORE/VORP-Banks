@@ -16,8 +16,6 @@ namespace VORP_BankServer
             EventHandlers["vorp:registerUserInBank"] += new Action<Player,string>(registerUserInBank);
             Delay(100);
             RegisterEvents();
-            
-           
         }
 
         private void RegisterEvents()

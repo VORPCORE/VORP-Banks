@@ -14,8 +14,12 @@ namespace VORP_BankServer
         //TODO Get all users in each bank and create dictionary bank using database
         public Database(){
             //Create each bank
-            Debug.WriteLine("Cogiendo de la base de datos");
-            Delay(2500);
+            LoadDatabase();
+        }
+
+        private void LoadDatabase()
+        {
+            Delay(3000);
             Exports["ghmattimysql"].execute("SELECT * FROM banks", new Action<dynamic>((result) =>{
                 if(result != null){
                     foreach(var bank in result){
@@ -24,6 +28,7 @@ namespace VORP_BankServer
                     }
                     if (Banks.Count > 0)
                     {
+                        Delay(500);
                         Exports["ghmattimysql"].execute("SELECT * FROM bank_users", new Action<dynamic>((aresult) => {
                             if (aresult != null)
                             {
@@ -44,6 +49,5 @@ namespace VORP_BankServer
                 }
             }));
         }
-
     }
 }

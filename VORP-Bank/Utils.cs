@@ -5,17 +5,41 @@ using System.Text;
 using System.Threading.Tasks;
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
+using Newtonsoft.Json.Linq;
 /*PROPERTY OF KLC_BY AVILILLA*/
 namespace VORP_Bank
 {
     public class Utils:BaseScript
     {
-        //Posicion 
-        // public static Dictionary<string,Vector3> bankPositions= new Dictionary<string,Vector3>()
-        // {
-        //     {"SAINTDENIS",new Vector3(-341.07f,767.35f,116.71f)}
-        // };
-        public Utils(){}
+        public static List<int> Blips = new List<int>();
+
+        public Utils()
+        {
+            EventHandlers["onResourceStop"] += new Action<string>(s =>
+            {
+                if (API.GetCurrentResourceName() == s)
+                {
+                    foreach (int blip in Blips)
+                    {
+                        int _blip = blip;
+                        API.RemoveBlip(ref _blip);
+                    }
+                    API.SetNuiFocus(false, false);
+                }
+            });
+        }
+
+        public static void CreateBlips(JToken banks)
+        {
+            foreach (JToken bank in banks)
+            {
+                int blip = Function.Call<int>((Hash)0x554D9D53F696D002, 1664425300, 
+                    bank["coords"]["x"].ToObject<float>(), bank["coords"]["y"].ToObject<float>(), bank["coords"]["z"].ToObject<float>());
+                Function.Call((Hash)0x74F74D3207ED525C, blip, bank["blipHash"].ToObject<int>(), 1);
+                Function.Call((Hash)0x9CB1A1623062F402, blip, bank["blipName"].ToString());
+                Blips.Add(blip);
+            }
+        }
     
         public static async Task DrawTxt(string text, float x, float y, float fontscale, float fontsize, int r, int g, int b, int alpha, bool textcentred, bool shadow)
         {
