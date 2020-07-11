@@ -50,6 +50,9 @@ namespace VORP_BankServer
             if (!bankUsers.ContainsKey(user.Identifier))
             {
                 bankUsers.Add(user.Identifier, user);
+                Exports["ghmattimysql"]
+                    .execute(
+                        $"INSERT INTO bank_users (name,identifier,money,gold) VALUES ({_name},{user.Identifier},{user.Money},{user.Gold}");
             }
         }
 
@@ -59,6 +62,7 @@ namespace VORP_BankServer
             if (!this.bankUsers.ContainsKey(user.Identifier))
             {
                 this.bankUsers.Add(identifier,user);
+                
             }
         }
 
