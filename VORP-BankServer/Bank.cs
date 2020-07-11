@@ -23,7 +23,17 @@ namespace VORP_BankServer
             double result = 0.0;
             foreach (KeyValuePair<string,BankUser> user_bank in bankUsers)
             {
-                result += user_bank.Value.GetMoney();
+                result += user_bank.Value.Money;
+            }
+            return result;
+        }
+
+        public double GetBankGold()
+        {
+            double result = 0.0;
+            foreach (KeyValuePair<string,BankUser> user_bank in bankUsers)
+            {
+                result += user_bank.Value.Gold;
             }
 
             return result;
@@ -37,15 +47,15 @@ namespace VORP_BankServer
 
         public void AddUser(BankUser user)
         {
-            if (!this.bankUsers.ContainsKey(user.Identifier))
+            if (!bankUsers.ContainsKey(user.Identifier))
             {
-                this.bankUsers.Add(user.Identifier, user);
+                bankUsers.Add(user.Identifier, user);
             }
         }
 
         public void AddNewUser(string identifier)
         {
-            BankUser user = new BankUser(identifier,0.0,0.0);
+            BankUser user = new BankUser(identifier,0.0,0.0,_name);
             if (!this.bankUsers.ContainsKey(user.Identifier))
             {
                 this.bankUsers.Add(identifier,user);
@@ -66,62 +76,46 @@ namespace VORP_BankServer
 
         public bool AddUserMoney(string identifier,double money){
             if(bankUsers.ContainsKey(identifier)){
-                double newMoney = bankUsers[identifier].GetMoney()+money;
-                bankUsers[identifier].SetMoney(newMoney);
+                bankUsers[identifier].AddMoney(money);
                 return true;
             }else{
-                bankUsers.Add(identifier,new BankUser(identifier,0,money));
+                bankUsers.Add(identifier,new BankUser(identifier,0,money,_name));
                 return true;
             }
         }
 
         public bool SubUserMoney(string identifier,double money){
-            if(bankUsers.ContainsKey(identifier)){
-                double nowMoney = bankUsers[identifier].GetMoney();
-                if(nowMoney-money < 0.0){
-                    return false;
-                }else{
-                    bankUsers[identifier].SetMoney(nowMoney-money);
-                    return true;
-                }
-            }else{
-                return false;
-            }
+            if(bankUsers.ContainsKey(identifier))
+            {
+                return bankUsers[identifier].SubMoney(money);
+            }else return false;
         }
 
         public bool AddUserGold(string identifier,double gold){
             if(bankUsers.ContainsKey(identifier)){
-                double newGold = bankUsers[identifier].GetGold()+gold;
-                bankUsers[identifier].SetMoney(newGold);
+                bankUsers[identifier].AddGold(gold);
                 return true;
             }else{
-                bankUsers.Add(identifier,new BankUser(identifier,gold,0));
+                bankUsers.Add(identifier,new BankUser(identifier,gold,0,_name));
                 return true;
             }
         }
 
         public bool SubUserGold(string identifier,double gold){
-            if(bankUsers.ContainsKey(identifier)){
-                double nowGold = bankUsers[identifier].GetGold();
-                if(nowGold-gold < 0.0){
-                    return false;
-                }else{
-                    bankUsers[identifier].SetMoney(nowGold-gold);
-                    return true;
-                }
-            }else{
-                return false;
-            }
+            if(bankUsers.ContainsKey(identifier))
+            {
+                return bankUsers[identifier].SubGold(gold);
+            }else return false;
         }
 
         public string GetName()
         {
-            return this._name;
+            return _name;
         }
 
         public void SetName(string name)
         {
-            this._name = name;
+            _name = name;
         }
     }
 }

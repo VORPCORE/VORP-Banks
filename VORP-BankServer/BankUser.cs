@@ -39,13 +39,13 @@ namespace VORP_BankServer
         public double Gold
         {
             get => _gold;
-            set => _gold = value;
+            set { _gold = value; UpdateUser();}
         }
 
         public double Money
         {
             get => _money;
-            set => _money = value;
+            set { _money = value; UpdateUser(); }
         }
 
         public void AddMoney(double money)
@@ -53,6 +53,7 @@ namespace VORP_BankServer
             if (money >= 0)
             {
                 _money += money;
+                UpdateUser();
             }
         }
 
@@ -61,7 +62,7 @@ namespace VORP_BankServer
             if (gold >= 0)
             {
                 _gold = gold;
-                
+                UpdateUser();
             }
         }
 
@@ -72,6 +73,7 @@ namespace VORP_BankServer
                 if (_money >= (_money - money))
                 {
                     _money -= money;
+                    UpdateUser();
                     return true;
                 }
                 else return false;
@@ -86,6 +88,7 @@ namespace VORP_BankServer
                 if (_gold >= (_gold - gold))
                 {
                     _gold -= gold;
+                    UpdateUser();
                     return true;
                 }
                 else return false;

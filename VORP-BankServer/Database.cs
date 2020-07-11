@@ -39,7 +39,7 @@ namespace VORP_BankServer
                                         if (Banks.ContainsKey(user.name.ToString()))
                                         {
                                             Bank aux = Banks[user.name.ToString()];
-                                            aux.AddUser(new BankUser(user.identifier.ToString(),double.Parse(user.gold.ToString()), double.Parse(user.money.ToString())));
+                                            aux.AddUser(new BankUser(user.identifier.ToString(),double.Parse(user.gold.ToString()), double.Parse(user.money.ToString()),aux.GetName()));
                                         }
                                     }
                                 }
