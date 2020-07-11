@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using VORP_BankClient;
+
 /*PROPERTY OF KLC_BY AVILILLA*/
 namespace VORP_Bank
 {
@@ -14,6 +16,7 @@ namespace VORP_Bank
     {
         public NuiControl()
         {
+            EventHandlers["vorp:refreshBank"] += new Action<double,double>(RefreshBank);
             API.RegisterNuiCallbackType("Deposit");
             EventHandlers["__cfx_nui:Deposit"] += new Action<ExpandoObject>(Deposit);
 
@@ -30,6 +33,14 @@ namespace VORP_Bank
             EventHandlers["__cfx_nui:NUIFocusOff"] += new Action<ExpandoObject>(NUIFocusOff);
         }
 
+        private void RefreshBank(double money, double gold)
+        {
+            JObject data = new JObject();
+            data.Add("money",money);
+            data.Add("gold",gold);
+            API.SendNuiMessage(data.ToString());
+        }
+
         private void Deposit(ExpandoObject obj)
         {
             if(obj != null)
@@ -38,7 +49,15 @@ namespace VORP_Bank
                 Debug.WriteLine(data.ToString());
                 double money = data["money"].ToObject<double>();
                 double gold = data["gold"].ToObject<double>();
-                
+                if (money > 0.0)
+                {
+                    TriggerServerEvent("vorp:bankAddMoney",Client.UsedBank,money);
+                }
+
+                if (gold > 0.0)
+                {
+                    TriggerServerEvent("vorp:bankAddGold",Client.UsedBank,gold);
+                }
                 //uno de los dos o los dos pueden tener valor si no tuvieran devuelven 0 
             }
         }

@@ -11,11 +11,11 @@ using VORP_Bank;
 /*PROPERTY OF KLC_BY AVILILLA*/
 namespace VORP_BankClient
 {
-    public class Main:BaseScript
+    public class Client:BaseScript
     {
         private bool InBank = false;
-        private string UsedBank;
-        public Main()
+        public static string UsedBank;
+        public Client()
         {
             EventHandlers["onClientResourceStart"] += new Action<string>(OnClientResourceStart);
             EventHandlers["vorp:giveUserInfo"] += new Action<double,double>(getUserInfo);

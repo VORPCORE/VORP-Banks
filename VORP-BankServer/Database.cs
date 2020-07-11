@@ -19,7 +19,7 @@ namespace VORP_BankServer
 
         private void LoadDatabase()
         {
-            Delay(3000);
+            Delay(5000);
             Exports["ghmattimysql"].execute("SELECT * FROM banks", new Action<dynamic>((result) =>{
                 if(result != null){
                     foreach(var bank in result){
