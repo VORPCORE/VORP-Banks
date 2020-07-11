@@ -12,14 +12,21 @@ namespace VORP_BankServer
 
         private Dictionary<string,BankUser> bankUsers = new Dictionary<string, BankUser>();
         private string _name;
-        private double _money;
-        private double _gold;
-      
-        public Bank(string name, double money, double gold)
+
+        public Bank(string name)
         {
             this._name = name;
-            this._money = money;
-            this._gold = gold;
+        }
+
+        public double GetBankMoney()
+        {
+            double result = 0.0;
+            foreach (KeyValuePair<string,BankUser> user_bank in bankUsers)
+            {
+                result += user_bank.Value.GetMoney();
+            }
+
+            return result;
         }
 
         public void ShowUsers(){
@@ -61,7 +68,6 @@ namespace VORP_BankServer
             if(bankUsers.ContainsKey(identifier)){
                 double newMoney = bankUsers[identifier].GetMoney()+money;
                 bankUsers[identifier].SetMoney(newMoney);
-                this._money+= money;
                 return true;
             }else{
                 bankUsers.Add(identifier,new BankUser(identifier,0,money));
@@ -76,7 +82,6 @@ namespace VORP_BankServer
                     return false;
                 }else{
                     bankUsers[identifier].SetMoney(nowMoney-money);
-                    this._money-= money;
                     return true;
                 }
             }else{
@@ -88,7 +93,6 @@ namespace VORP_BankServer
             if(bankUsers.ContainsKey(identifier)){
                 double newGold = bankUsers[identifier].GetGold()+gold;
                 bankUsers[identifier].SetMoney(newGold);
-                this._gold+= gold;
                 return true;
             }else{
                 bankUsers.Add(identifier,new BankUser(identifier,gold,0));
@@ -103,7 +107,6 @@ namespace VORP_BankServer
                     return false;
                 }else{
                     bankUsers[identifier].SetMoney(nowGold-gold);
-                    this._gold-= gold;
                     return true;
                 }
             }else{
@@ -119,26 +122,6 @@ namespace VORP_BankServer
         public void SetName(string name)
         {
             this._name = name;
-        }
-
-        public double GetMoney()
-        {
-            return this._money;
-        }
-
-        public void SetMoney(double money)
-        {
-            this._money = money;
-        }
-
-        public double GetGold()
-        {
-            return this._gold;
-        }
-
-        public void SetGold(double gold)
-        {
-            this._gold = gold;
         }
     }
 }

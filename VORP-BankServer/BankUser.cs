@@ -4,20 +4,24 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using CitizenFX.Core;
+
 /*PROPERTY OF KLC_BY AVILILLA*/
 namespace VORP_BankServer
 {
-    public class BankUser
+    public class BankUser:BaseScript
     {
         private string _identifier;
         private double _gold;
         private double _money;
+        private string _bank;
 
-        public BankUser(string identifier,double gold,double money)
+        public BankUser(string identifier,double gold,double money,string bank)
         {
-            this._gold = gold;
-            this._identifier = identifier;
-            this._money = money;
+            _gold = gold;
+            _identifier = identifier;
+            _money = money;
+            _bank = bank;
         }
 
         public string Identifier
@@ -31,21 +35,70 @@ namespace VORP_BankServer
                 }
             }
         }
-
-        public double GetMoney(){
-            return this._money;
+        
+        public double Gold
+        {
+            get => _gold;
+            set => _gold = value;
         }
 
-        public void SetMoney(double money){
-            this._money = money;
+        public double Money
+        {
+            get => _money;
+            set => _money = value;
         }
 
-        public double GetGold(){
-            return this._gold;
+        public void AddMoney(double money)
+        {
+            if (money >= 0)
+            {
+                _money += money;
+            }
         }
 
-        public void SetGold(double gold){
-            this._gold = gold;
+        public void AddGold(double gold)
+        {
+            if (gold >= 0)
+            {
+                _gold = gold;
+                
+            }
+        }
+
+        public bool SubMoney(double money)
+        {
+            if (money >= 0)
+            {
+                if (_money >= (_money - money))
+                {
+                    _money -= money;
+                    return true;
+                }
+                else return false;
+            }
+            else return false;
+        }
+        
+        public bool SubGold(double gold)
+        {
+            if (gold >= 0)
+            {
+                if (_gold >= (_gold - gold))
+                {
+                    _gold -= gold;
+                    return true;
+                }
+                else return false;
+            }
+            else return false;
+        }
+
+        public void UpdateUser()
+        {
+            Exports["ghmattimysql"]
+                .execute(
+                    $"UPDATE bank_users SET money = '{_money}', gold = {_gold} WHERE identifier=? and name =?",
+                    new[] { _identifier,_bank});
         }
     }
 }

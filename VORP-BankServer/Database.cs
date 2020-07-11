@@ -23,7 +23,7 @@ namespace VORP_BankServer
             Exports["ghmattimysql"].execute("SELECT * FROM banks", new Action<dynamic>((result) =>{
                 if(result != null){
                     foreach(var bank in result){
-                        Banks.Add(bank.name.ToString(),new Bank(bank.name.ToString(),double.Parse(bank.money.ToString()),double.Parse(bank.gold.ToString())));
+                        Banks.Add(bank.name.ToString(),new Bank(bank.name.ToString()));
                         Debug.WriteLine($"Added :{bank.name} with {bank.money} money and {bank.gold} gold");
                     }
                     if (Banks.Count > 0)
