@@ -16,12 +16,18 @@ namespace VORP_BankServer
         private double _money;
         private string _bank;
 
-        public BankUser(string identifier,double gold,double money,string bank)
+        public BankUser(string identifier,double gold,double money,string bank,bool newWith)
         {
             _gold = gold;
             _identifier = identifier;
             _money = money;
             _bank = bank;
+            if (newWith)
+            {
+                Exports["ghmattimysql"]
+                    .execute(
+                        $"INSERT INTO bank_users (name,identifier,money,gold) VALUES ('{_bank}','{_identifier}',{_money},{_gold};");
+            }
         }
 
         public string Identifier
@@ -39,13 +45,13 @@ namespace VORP_BankServer
         public double Gold
         {
             get => _gold;
-            set { _gold = value; UpdateUser();}
+            set { _gold = value;}
         }
 
         public double Money
         {
             get => _money;
-            set { _money = value; UpdateUser(); }
+            set { _money = value; }
         }
 
         public void AddMoney(double money)
@@ -53,7 +59,7 @@ namespace VORP_BankServer
             if (money >= 0)
             {
                 _money += money;
-                UpdateUser();
+                UpdateUser(money,"money","add");
             }
         }
 
@@ -61,8 +67,8 @@ namespace VORP_BankServer
         {
             if (gold >= 0)
             {
-                _gold = gold;
-                UpdateUser();
+                _gold += gold;
+                UpdateUser(gold,"gold","add");
             }
         }
 
@@ -73,7 +79,7 @@ namespace VORP_BankServer
                 if (_money >= (_money - money))
                 {
                     _money -= money;
-                    UpdateUser();
+                    UpdateUser(money,"money","sub");
                     return true;
                 }
                 else return false;
@@ -88,7 +94,7 @@ namespace VORP_BankServer
                 if (_gold >= (_gold - gold))
                 {
                     _gold -= gold;
-                    UpdateUser();
+                    UpdateUser(gold,"gold","sub");
                     return true;
                 }
                 else return false;
@@ -96,12 +102,48 @@ namespace VORP_BankServer
             else return false;
         }
 
-        public void UpdateUser()
+        public void UpdateUser(double cuantity,string type,string type2)
         {
-            Exports["ghmattimysql"]
-                .execute(
-                    $"UPDATE bank_users SET money = '{_money}', gold = {_gold} WHERE identifier=? and name =?",
-                    new[] { _identifier,_bank});
+            switch (type)
+            {
+                case "money":
+                    switch (type2)
+                    {
+                        case "add":
+                            Exports["ghmattimysql"]
+                                .execute(
+                                    $"UPDATE bank_users SET money = money+'{cuantity}' WHERE identifier=? and name =?;",
+                                    new[] { _identifier,_bank});
+                            break;
+                        case "sub":
+                            Exports["ghmattimysql"]
+                                .execute(
+                                    $"UPDATE bank_users SET money = money-'{cuantity}' WHERE identifier=? and name =?;",
+                                    new[] { _identifier,_bank});
+                            break;
+                    }
+                    break;
+                case "gold":
+                    switch (type2)
+                    {
+                        case "add":
+                            Exports["ghmattimysql"]
+                                .execute(
+                                    $"UPDATE bank_users SET gold = gold+'{cuantity}' WHERE identifier=? and name =?;",
+                                    new[] { _identifier,_bank});
+                            break;
+                        case "sub":
+                            Exports["ghmattimysql"]
+                                .execute(
+                                    $"UPDATE bank_users SET gold = gold-'{cuantity}' WHERE identifier=? and name =?;",
+                                    new[] { _identifier,_bank});
+                            break;
+                    } 
+                    break;
+                default:
+                    Debug.WriteLine("Error al intentar setear en base de datos");
+                    break;
+            }
         }
     }
 }

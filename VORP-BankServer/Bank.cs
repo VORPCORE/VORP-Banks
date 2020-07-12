@@ -50,19 +50,15 @@ namespace VORP_BankServer
             if (!bankUsers.ContainsKey(user.Identifier))
             {
                 bankUsers.Add(user.Identifier, user);
-                Exports["ghmattimysql"]
-                    .execute(
-                        $"INSERT INTO bank_users (name,identifier,money,gold) VALUES ({_name},{user.Identifier},{user.Money},{user.Gold}");
             }
         }
 
         public void AddNewUser(string identifier)
         {
-            BankUser user = new BankUser(identifier,0.0,0.0,_name);
+            BankUser user = new BankUser(identifier,0.0,0.0,_name,true);
             if (!this.bankUsers.ContainsKey(user.Identifier))
             {
                 this.bankUsers.Add(identifier,user);
-                
             }
         }
 
@@ -83,7 +79,7 @@ namespace VORP_BankServer
                 bankUsers[identifier].AddMoney(money);
                 return true;
             }else{
-                bankUsers.Add(identifier,new BankUser(identifier,0,money,_name));
+                bankUsers.Add(identifier,new BankUser(identifier,0,money,_name,true));
                 return true;
             }
         }
@@ -100,7 +96,7 @@ namespace VORP_BankServer
                 bankUsers[identifier].AddGold(gold);
                 return true;
             }else{
-                bankUsers.Add(identifier,new BankUser(identifier,gold,0,_name));
+                bankUsers.Add(identifier,new BankUser(identifier,gold,0,_name,true));
                 return true;
             }
         }

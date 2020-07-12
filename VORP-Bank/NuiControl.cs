@@ -35,7 +35,9 @@ namespace VORP_Bank
 
         private void RefreshBank(double money, double gold)
         {
+            Debug.WriteLine("Me actualizo");
             JObject data = new JObject();
+            data.Add("action","updateNumbers");
             data.Add("money",money);
             data.Add("gold",gold);
             API.SendNuiMessage(data.ToString());
@@ -107,11 +109,7 @@ namespace VORP_Bank
         {
             if (obj != null)
             {
-                JObject data = JObject.FromObject(obj);
-                Debug.WriteLine(data.ToString());
-                double money = data["money"].ToObject<double>();
-                double gold = data["gold"].ToObject<double>();
-                //uno de los dos o los dos pueden tener valor si no tuvieran devuelven 0 
+                API.SetNuiFocus(false, false);
             }
         }
     }
