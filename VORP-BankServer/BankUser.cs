@@ -26,7 +26,7 @@ namespace VORP_BankServer
             {
                 Exports["ghmattimysql"]
                     .execute(
-                        $"INSERT INTO bank_users (name,identifier,money,gold) VALUES ('{_bank}','{_identifier}',{_money},{_gold};");
+                        $"INSERT INTO bank_users (name,identifier,money,gold) VALUES (?,?,?,?)",new object[] {_bank,_identifier,_money,_gold});
             }
         }
 
@@ -76,7 +76,7 @@ namespace VORP_BankServer
         {
             if (money >= 0)
             {
-                if (_money >= (_money - money))
+                if (_money >= money)
                 {
                     _money -= money;
                     UpdateUser(money,"money","sub");
@@ -91,7 +91,7 @@ namespace VORP_BankServer
         {
             if (gold >= 0)
             {
-                if (_gold >= (_gold - gold))
+                if (_gold >= gold)
                 {
                     _gold -= gold;
                     UpdateUser(gold,"gold","sub");

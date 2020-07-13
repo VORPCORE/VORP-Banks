@@ -21,7 +21,7 @@ namespace VORP_Bank
             EventHandlers["__cfx_nui:Deposit"] += new Action<ExpandoObject>(Deposit);
 
             API.RegisterNuiCallbackType("Withdraw");
-            EventHandlers["__cfx_nui:Withdraw"] += new Action<ExpandoObject>(Deposit);
+            EventHandlers["__cfx_nui:Withdraw"] += new Action<ExpandoObject>(Withdraw);
 
             API.RegisterNuiCallbackType("searchUsers");
             EventHandlers["__cfx_nui:searchUsers"] += new Action<ExpandoObject>(searchUsers);
@@ -79,7 +79,7 @@ namespace VORP_Bank
 
                 if (gold > 0.0)
                 {
-                    TriggerServerEvent("vorp:bankSubGold",Client.UsedBank,gold,"withdraw");
+                    TriggerServerEvent("vorp:bankSubGold", Client.UsedBank,gold,"withdraw");
                 }
                 //uno de los dos o los dos pueden tener valor si no tuvieran devuelven 0 
 
@@ -93,10 +93,11 @@ namespace VORP_Bank
                 JObject data = JObject.FromObject(obj);
                 Debug.WriteLine(data.ToString());
                 string name = data["name"].ToString();
+                TriggerEvent("vorp:ExecuteServerCallBack", "retrieveUserBankInfo", new Action<dynamic>((args) =>
+                {
 
-                //minimo te devuelve 3 caracteres esta bloqueado desde el html para evitar que no escriban nada
-                //cuando a ti te llege esto deberas tu enviarle la lista de ususarios que empiezen por esto
 
+                }),name);
             }
         }
 

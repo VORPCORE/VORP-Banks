@@ -6,6 +6,13 @@
       "blipName": "Saint Denis Bank",
       "blipHash": -2128054417,
       "coords": {"x": -341.07,"y": 767.35 ,"z": 116.71}
+    },
+    {
+      "name": "BlackWater", //Dont touch
+      "hudName":"BLACK WATER",
+      "blipName": "Black Water Bank",
+      "blipHash": -2128054417,
+      "coords": {"x": -322.12,"y": 804.0 ,"z": 117.88}
     }
   ]
 }

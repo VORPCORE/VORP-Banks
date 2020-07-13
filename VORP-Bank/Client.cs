@@ -55,7 +55,7 @@ namespace VORP_BankClient
         private async Task OpenBank(string bank,string hudname)
         {
             InBank = true;
-            TriggerEvent("vorp:triggerServerCallBack", "retrieveUserBankInfo", new Action<dynamic>((args) =>
+            TriggerEvent("vorp:ExecuteServerCallBack", "retrieveUserBankInfo", new Action<dynamic>((args) =>
             {
                 Debug.WriteLine(bank);
                 JObject data = new JObject();

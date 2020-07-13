@@ -9,6 +9,6 @@ D:\[VORP]\VORP-Banks\VORP-BankServer\obj\Debug\VORP-BankServer.csprojAssemblyRef
 D:\[VORP]\VORP-Banks\VORP-BankServer\obj\Debug\VORP-BankServer.csproj.CoreCompileInputs.cache
 D:\[VORP]\VORP-Banks\VORP-BankServer\obj\Debug\VORP-BankServer.net.dll
 D:\[VORP]\VORP-Banks\VORP-BankServer\obj\Debug\VORP-BankServer.net.pdb
-D:\[VORP]\VORP-Banks\VORP-BankServer\obj\Debug\VORP-BankServer.csproj.CopyComplete
 D:\redmlosreyes\server-data\resources\[VORP]\vorp_banks\VORP-BankServer.net.dll
 D:\redmlosreyes\server-data\resources\[VORP]\vorp_banks\VORP-BankServer.net.pdb
+D:\redmlosreyes\server-data\resources\[VORP]\vorp_banks\Config.json

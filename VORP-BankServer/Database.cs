@@ -17,9 +17,9 @@ namespace VORP_BankServer
             LoadDatabase();
         }
 
-        private void LoadDatabase()
+        private async void LoadDatabase()
         {
-            Delay(5000);
+            await Delay(2000);
             Exports["ghmattimysql"].execute("SELECT * FROM banks", new Action<dynamic>((result) =>{
                 if(result != null){
                     foreach(var bank in result){
@@ -28,7 +28,6 @@ namespace VORP_BankServer
                     }
                     if (Banks.Count > 0)
                     {
-                        Delay(500);
                         Exports["ghmattimysql"].execute("SELECT * FROM bank_users", new Action<dynamic>((aresult) => {
                             if (aresult != null)
                             {

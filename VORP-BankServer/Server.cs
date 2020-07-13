@@ -43,6 +43,27 @@ namespace VORP_BankServer
                     }
                 }
             }));
+            TriggerEvent("vorp:addNewCallBack","searchUsers",new Action<int,CallbackDelegate,dynamic>(
+                (source, cb, args) =>
+                {
+                    Exports["ghmattimysql"].execute("SELECT firstname,lastname,identifier FROM characters", new Action<dynamic>((result) =>
+                    {
+                        List<Dictionary<string,dynamic>> usersList = new List<Dictionary<string, dynamic>>();
+                        Dictionary<string, dynamic> auxUser;
+                        if (result != null)
+                        {
+                            foreach (dynamic user in result)
+                            {
+                                auxUser = new Dictionary<string, dynamic>();
+                                auxUser.Add("identifier",user.identifier);
+                                auxUser.Add("firstname",user.firstname);
+                                auxUser.Add("lastname",user.lastname);
+                                usersList.Add(auxUser);
+                            }
+                        }
+                        cb(usersList);
+                    }));
+                }));
         }
 
         private void registerUserInBank([FromSource]Player source,string bank){
@@ -56,15 +77,19 @@ namespace VORP_BankServer
         {
             string identifier = "steam:" + source.Identifiers["steam"];
             if(Database.Banks.ContainsKey(bank)){
-                if(Database.Banks[bank].UserExist(identifier)){
-                    if(type =="withdraw")TriggerEvent("vorp:addMoney", int.Parse(source.Handle), 0,cuantity);
-                    Database.Banks[bank].SubUserMoney(identifier,cuantity);
+                if (Database.Banks[bank].UserExist(identifier)){
+                    if (Database.Banks[bank].SubUserMoney(identifier, cuantity))
+                    {
+                        if (type == "withdraw") TriggerEvent("vorp:addMoney", int.Parse(source.Handle), 0, cuantity);
+                    }
                     source.TriggerEvent("vorp:refreshBank",Database.Banks[bank].GetUser(identifier).Money,
                         Database.Banks[bank].GetUser(identifier).Gold);
                 }else{
                     Database.Banks[bank].AddNewUser(identifier);
-                    if(type =="withdraw")TriggerEvent("vorp:addMoney", int.Parse(source.Handle), 0, cuantity);
-                    Database.Banks[bank].SubUserMoney(identifier,cuantity);
+                    if (Database.Banks[bank].SubUserMoney(identifier, cuantity))
+                    {
+                        if (type == "withdraw") TriggerEvent("vorp:addMoney", int.Parse(source.Handle), 0, cuantity);
+                    }
                     source.TriggerEvent("vorp:refreshBank",Database.Banks[bank].GetUser(identifier).Money,
                         Database.Banks[bank].GetUser(identifier).Gold);
                 }  
@@ -75,15 +100,19 @@ namespace VORP_BankServer
         {
             string identifier = "steam:" + source.Identifiers["steam"];
             if(Database.Banks.ContainsKey(bank)){
-                if(Database.Banks[bank].UserExist(identifier)){
-                    if(type =="withdraw")TriggerEvent("vorp:addMoney", int.Parse(source.Handle), 1,cuantity);
-                    Database.Banks[bank].SubUserGold(identifier,cuantity);
+                if (Database.Banks[bank].UserExist(identifier)){
+                    if (Database.Banks[bank].SubUserGold(identifier, cuantity))
+                    {
+                        if(type =="withdraw")TriggerEvent("vorp:addMoney", int.Parse(source.Handle), 1,cuantity);
+                    }
                     source.TriggerEvent("vorp:refreshBank",Database.Banks[bank].GetUser(identifier).Money,
                         Database.Banks[bank].GetUser(identifier).Gold);
                 }else{
                     Database.Banks[bank].AddNewUser(identifier);
-                    if(type =="withdraw")TriggerEvent("vorp:addMoney", int.Parse(source.Handle), 1, cuantity);
-                    Database.Banks[bank].SubUserGold(identifier,cuantity);
+                    if(Database.Banks[bank].SubUserGold(identifier,cuantity))
+                    {
+                        if(type =="withdraw")TriggerEvent("vorp:addMoney", int.Parse(source.Handle), 1, cuantity);
+                    }
                     source.TriggerEvent("vorp:refreshBank",Database.Banks[bank].GetUser(identifier).Money,
                         Database.Banks[bank].GetUser(identifier).Gold);
                 }  
@@ -92,39 +121,68 @@ namespace VORP_BankServer
 
         private void addMoney([FromSource]Player source,string bank,double cuantity,string type){
             string identifier = "steam:" + source.Identifiers["steam"];
-            if(Database.Banks.ContainsKey(bank)){
-                if(Database.Banks[bank].UserExist(identifier)){
-                    if(type == "deposit")TriggerEvent("vorp:removeMoney", int.Parse(source.Handle), 0,cuantity);
-                    Database.Banks[bank].AddUserMoney(identifier,cuantity);
-                    source.TriggerEvent("vorp:refreshBank",Database.Banks[bank].GetUser(identifier).Money,
-                        Database.Banks[bank].GetUser(identifier).Gold);
-                }else{
-                    Database.Banks[bank].AddNewUser(identifier);
-                    if(type == "deposit")TriggerEvent("vorp:removeMoney", int.Parse(source.Handle), 0, cuantity);
-                    Database.Banks[bank].AddUserMoney(identifier,cuantity);
-                    source.TriggerEvent("vorp:refreshBank",Database.Banks[bank].GetUser(identifier).Money,
-                        Database.Banks[bank].GetUser(identifier).Gold);
-                }  
-            }
+            TriggerEvent("vorp:getCharacter", int.Parse(source.Handle), new Action<dynamic>((user) =>
+            {
+                if(user.money >= cuantity)
+                {
+                    if (Database.Banks.ContainsKey(bank))
+                    {
+                        if (Database.Banks[bank].UserExist(identifier))
+                        {   
+                            if (Database.Banks[bank].AddUserMoney(identifier, cuantity))
+                            {
+                                if (type == "deposit") TriggerEvent("vorp:removeMoney", int.Parse(source.Handle), 0, cuantity);
+                            }
+                            source.TriggerEvent("vorp:refreshBank", Database.Banks[bank].GetUser(identifier).Money,
+                                Database.Banks[bank].GetUser(identifier).Gold);
+                        }
+                        else
+                        {
+                            Database.Banks[bank].AddNewUser(identifier);
+                            if (Database.Banks[bank].AddUserMoney(identifier, cuantity))
+                            {
+                                if (type == "deposit") TriggerEvent("vorp:removeMoney", int.Parse(source.Handle), 0, cuantity);
+                            }
+                            source.TriggerEvent("vorp:refreshBank", Database.Banks[bank].GetUser(identifier).Money,
+                                Database.Banks[bank].GetUser(identifier).Gold);
+                        }
+                    }
+                }
+            }));
+            
         }
 
         private void addGold([FromSource]Player source,string bank,double cuantity,string type){
             string identifier = "steam:" + source.Identifiers["steam"];
-            if(Database.Banks.ContainsKey(bank)){
-                if(Database.Banks[bank].UserExist(identifier)){
-                    if(type == "deposit")TriggerEvent("vorp:removeMoney", int.Parse(source.Handle), 1,cuantity);
-                    Database.Banks[bank].AddUserGold(identifier,cuantity);
-                    source.TriggerEvent("vorp:refreshBank",Database.Banks[bank].GetUser(identifier).Money,
-                        Database.Banks[bank].GetUser(identifier).Gold);
-                }else{
-                    Database.Banks[bank].AddNewUser(identifier);
-                    if(type == "deposit")TriggerEvent("vorp:removeMoney", int.Parse(source.Handle), 1,cuantity);
-                    TriggerEvent("vorp:removeMoney", int.Parse(source.Handle), 1,cuantity);
-                    Database.Banks[bank].AddUserGold(identifier,cuantity);
-                    source.TriggerEvent("vorp:refreshBank",Database.Banks[bank].GetUser(identifier).Money,
-                        Database.Banks[bank].GetUser(identifier).Gold);
-                }  
-            }
+            TriggerEvent("vorp:getCharacter", int.Parse(source.Handle), new Action<dynamic>((user) =>
+            {
+                if (user.gold >= cuantity)
+                {
+                    if (Database.Banks.ContainsKey(bank))
+                    {
+                        if (Database.Banks[bank].UserExist(identifier))
+                        {
+                            if(Database.Banks[bank].AddUserGold(identifier, cuantity))
+                            {
+                                if (type == "deposit") TriggerEvent("vorp:removeMoney", int.Parse(source.Handle), 1, cuantity);
+                            }
+                            source.TriggerEvent("vorp:refreshBank", Database.Banks[bank].GetUser(identifier).Money,
+                                Database.Banks[bank].GetUser(identifier).Gold);
+                        }
+                        else
+                        {
+                            Database.Banks[bank].AddNewUser(identifier);
+                            if (Database.Banks[bank].AddUserGold(identifier, cuantity))
+                            {
+                                if (type == "deposit") TriggerEvent("vorp:removeMoney", int.Parse(source.Handle), 1, cuantity);
+                            }
+                            source.TriggerEvent("vorp:refreshBank", Database.Banks[bank].GetUser(identifier).Money,
+                                Database.Banks[bank].GetUser(identifier).Gold);
+                        }
+                    }
+                }
+            }));
+            
         }
     }
 }
