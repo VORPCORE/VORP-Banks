@@ -46,22 +46,14 @@ namespace VORP_BankServer
             TriggerEvent("vorp:addNewCallBack","searchUsers",new Action<int,CallbackDelegate,dynamic>(
                 (source, cb, args) =>
                 {
-                    Exports["ghmattimysql"].execute("SELECT firstname,lastname,identifier FROM characters", new Action<dynamic>((result) =>
+                    string argsres = args;
+                    string[] name = argsres.Split(' ');
+                    Exports["ghmattimysql"].execute("SELECT firstname,lastname,identifier FROM characters WHERE firstname LIKE ?", new string[] {"%"+name[0]+"%" } ,new Action<dynamic>((result) =>
                     {
-                        List<Dictionary<string,dynamic>> usersList = new List<Dictionary<string, dynamic>>();
-                        Dictionary<string, dynamic> auxUser;
-                        if (result != null)
+                        if(result != null)
                         {
-                            foreach (dynamic user in result)
-                            {
-                                auxUser = new Dictionary<string, dynamic>();
-                                auxUser.Add("identifier",user.identifier);
-                                auxUser.Add("firstname",user.firstname);
-                                auxUser.Add("lastname",user.lastname);
-                                usersList.Add(auxUser);
-                            }
+                            cb(result);
                         }
-                        cb(usersList);
                     }));
                 }));
         }

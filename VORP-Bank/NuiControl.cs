@@ -23,8 +23,8 @@ namespace VORP_Bank
             API.RegisterNuiCallbackType("Withdraw");
             EventHandlers["__cfx_nui:Withdraw"] += new Action<ExpandoObject>(Withdraw);
 
-            API.RegisterNuiCallbackType("searchUsers");
-            EventHandlers["__cfx_nui:searchUsers"] += new Action<ExpandoObject>(searchUsers);
+            API.RegisterNuiCallbackType("SearchUsers");
+            EventHandlers["__cfx_nui:SearchUsers"] += new Action<ExpandoObject>(searchUsers);
 
             API.RegisterNuiCallbackType("SendTransfer");
             EventHandlers["__cfx_nui:SendTransfer"] += new Action<ExpandoObject>(SendTransfer);
@@ -93,10 +93,23 @@ namespace VORP_Bank
                 JObject data = JObject.FromObject(obj);
                 Debug.WriteLine(data.ToString());
                 string name = data["name"].ToString();
-                TriggerEvent("vorp:ExecuteServerCallBack", "retrieveUserBankInfo", new Action<dynamic>((args) =>
+                Debug.WriteLine(name);
+                JObject sendData = new JObject();
+                TriggerEvent("vorp:ExecuteServerCallBack", "searchUsers", new Action<dynamic>((args) =>
                 {
-
-
+                    sendData.Add("action", "showUsers");
+                    JArray userList = new JArray();
+                    foreach(var user in args)
+                    {
+                        JObject useraux = new JObject();
+                        string resultname = user.firstname + " " + user.lastname;
+                        useraux.Add("name", resultname);
+                        useraux.Add("steam", user.identifier);
+                        userList.Add(useraux);
+                    }
+                    sendData.Add("userList", userList);
+                    Debug.WriteLine(sendData.ToString());
+                    API.SendNuiMessage(sendData.ToString());
                 }),name);
             }
         }
