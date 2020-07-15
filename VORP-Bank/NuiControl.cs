@@ -26,8 +26,8 @@ namespace VORP_Bank
             API.RegisterNuiCallbackType("SearchUsers");
             EventHandlers["__cfx_nui:SearchUsers"] += new Action<ExpandoObject>(searchUsers);
 
-            API.RegisterNuiCallbackType("SendTransfer");
-            EventHandlers["__cfx_nui:SendTransfer"] += new Action<ExpandoObject>(SendTransfer);
+            API.RegisterNuiCallbackType("Transfer");
+            EventHandlers["__cfx_nui:Transfer"] += new Action<ExpandoObject>(SendTransfer);
 
             API.RegisterNuiCallbackType("NUIFocusOff");
             EventHandlers["__cfx_nui:NUIFocusOff"] += new Action<ExpandoObject>(NUIFocusOff);
@@ -116,13 +116,15 @@ namespace VORP_Bank
 
         private void SendTransfer(ExpandoObject obj)
         {
+            Debug.WriteLine("Hola");
             if (obj != null)
             {
+                Debug.WriteLine("Entro");
                 JObject data = JObject.FromObject(obj);
                 Debug.WriteLine(data.ToString());
                 string steamId = data["steam"].ToString();
-                double money = data["money"].ToObject<double>();
-                double gold = data["gold"].ToObject<double>();
+                double money = double.Parse(data["money"].ToString());
+                double gold = double.Parse(data["gold"].ToString());
                 bool useInstantTax = data["instant"].ToObject<bool>();
                 TriggerServerEvent("vorp:userTransference", steamId, money, gold, useInstantTax,Client.UsedBank);
             }

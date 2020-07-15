@@ -78,6 +78,12 @@ namespace VORP_BankServer
         {
             //Quitarle el dinero al que envia la transferencia
             //Enviarselo a quien recibe la transferencia
+            Debug.WriteLine(source.Handle);
+            Debug.WriteLine(steamId);
+            Debug.WriteLine(money.ToString());
+            Debug.WriteLine(gold.ToString());
+            Debug.WriteLine(instant.ToString());
+            Debug.WriteLine(usedBank);
             PlayerList pl = new PlayerList();
             Player TargetPlayer = null; //Por si acaso esta mirando el banco que se actualice
             if (source.Identifiers["steam"] == steamId) return;
