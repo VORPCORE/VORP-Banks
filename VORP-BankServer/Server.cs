@@ -106,7 +106,7 @@ namespace VORP_BankServer
             {
                 if (subGoldAux(source, usedBank, gold, ""))
                 {
-                    AddMoneyTransference(steamId,gold,usedBank,TargetPlayer);
+                    AddGoldTransference(steamId,gold,usedBank,TargetPlayer);
                 }
             }
         }
