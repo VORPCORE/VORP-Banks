@@ -15,14 +15,15 @@ namespace VORP_BankServer
             EventHandlers["vorp:bankAddGold"] += new Action<Player,string,double,string>(addGold);
             EventHandlers["vorp:bankSubMoney"] += new Action<Player,string,double,string>(subMoney);
             EventHandlers["vorp:bankSubGold"] += new Action<Player,string,double,string>(subGold);
-            EventHandlers["vorp:userTransference"] += new Action<Player,string,double,double,bool,string>(Transference);
+            EventHandlers["vorp:userTransference"] += new Action<Player,string,double,double,bool,string,string>(Transference);
             EventHandlers["vorp:registerUserInBank"] += new Action<Player,string>(registerUserInBank);
             Delay(100);
             RegisterEvents();
         }
         //Parte de las transferencias
-        private void AddMoneyTransference(string steamId, double money, string usedBank,Player targetPlayer)
+        private bool AddMoneyTransference(string steamId, double money, string usedBank,Player targetPlayer)
         {
+            bool done = false;
             if (Database.Banks.ContainsKey(usedBank))
             {
                 if (Database.Banks[usedBank].UserExist(steamId))
@@ -33,6 +34,8 @@ namespace VORP_BankServer
                         targetPlayer.TriggerEvent("vorp:refreshBank",Database.Banks[usedBank].GetUser(steamId).Money,
                             Database.Banks[usedBank].GetUser(steamId).Gold);
                     }
+
+                    done = true;
                 }
                 else
                 {
@@ -44,11 +47,16 @@ namespace VORP_BankServer
                         targetPlayer.TriggerEvent("vorp:refreshBank",Database.Banks[usedBank].GetUser(steamId).Money,
                             Database.Banks[usedBank].GetUser(steamId).Gold);
                     }
+
+                    done = true;
                 }
             }
+
+            return done;
         }
-        private void AddGoldTransference(string steamId, double gold, string usedBank,Player targetPlayer)
+        private bool AddGoldTransference(string steamId, double gold, string usedBank,Player targetPlayer)
         {
+            bool done = false;
             if (Database.Banks.ContainsKey(usedBank))
             {
                 if (Database.Banks[usedBank].UserExist(steamId))
@@ -59,6 +67,8 @@ namespace VORP_BankServer
                         targetPlayer.TriggerEvent("vorp:refreshBank",Database.Banks[usedBank].GetUser(steamId).Money,
                             Database.Banks[usedBank].GetUser(steamId).Gold);
                     }
+
+                    done = true;
                 }
                 else
                 {
@@ -70,14 +80,20 @@ namespace VORP_BankServer
                         targetPlayer.TriggerEvent("vorp:refreshBank",Database.Banks[usedBank].GetUser(steamId).Money,
                             Database.Banks[usedBank].GetUser(steamId).Gold);
                     }
+
+                    done = true;
                 }
             }
+
+            return done;
         }
         
-        private void Transference([FromSource]Player source,string steamId,double money,double gold,bool instant,string usedBank)
+        //TODO SI HAY FALLO EN LA TRASFERENCIA VOLVERLE A METER EL DINERO QUE HABIA ENVIADO LA PERSONA EN EL BANCO PARA EVITAR PERDIDAS INECESARIAS
+        private void Transference([FromSource]Player source,string steamId,double money,double gold,bool instant,string usedBank,string reason)
         {
             //Quitarle el dinero al que envia la transferencia
             //Enviarselo a quien recibe la transferencia
+            bool transferenceDone = false;
             Debug.WriteLine(source.Handle);
             Debug.WriteLine(steamId);
             Debug.WriteLine(money.ToString());
@@ -99,15 +115,29 @@ namespace VORP_BankServer
             {
                 if (subMoneyAux(source, usedBank, money, ""))
                 {
-                    AddMoneyTransference(steamId, money, usedBank, TargetPlayer);
+                    if (AddMoneyTransference(steamId, money, usedBank, TargetPlayer))
+                    {
+                        transferenceDone = true;
+                    }
                 }
             }
             if (gold > 0)
             {
                 if (subGoldAux(source, usedBank, gold, ""))
                 {
-                    AddGoldTransference(steamId,gold,usedBank,TargetPlayer);
+                    if (AddGoldTransference(steamId, gold, usedBank, TargetPlayer))
+                    {
+                        transferenceDone = true;
+                    }
                 }
+            }
+
+            if (transferenceDone)
+            {
+                Exports["ghmattimysql"]
+                    .execute(
+                        $"INSERT INTO  transactions (bank,fromIdentifier,toIdentifier,money,gold,DATE,reason,bankto) VALUES (?,?,?,?,?,CURDATE(),?,?)",new object[] {usedBank,source.Identifiers["steam"],
+                            steamId,money,gold,reason,usedBank});
             }
         }
 
