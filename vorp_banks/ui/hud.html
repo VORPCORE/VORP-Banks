@@ -117,9 +117,7 @@
         <p id="bankDesc">Keeping your money safe since 1791</p>
         <div class="transfer-info">
             <input placeholder="Name of User" name="suser" minlength="3" type="text"><button class="btn" id="searchUsers">Search</button><br>
-            <input placeholder="Select user" name="user" minlength="5" type="text" list="users"><input placeholder="Reason" name="reason" minlength="3" maxlength="40" type="text">
-            <datalist id="users">
-            </datalist> $
+            <select placeholder="Select user" name="user" list="users" id="users"></select><input placeholder="Reason" name="reason" minlength="3" maxlength="40" type="text"> $
             <input type="number" placeholder="1.0" step="0.01" min="0" max="100000" name="tmoneyinput"> <span id="iconGold2">d</span> <input type="number" placeholder="1.0" step="0.01" min="0" max="100000" name="tgoldinput"><br>
             <input type="checkbox" id="instantBox" value=""> Instant Transfer (Tax 10.00$)<br>
 
@@ -242,24 +240,29 @@
             });
 
             //SendTransfer Function
-            $('#SendTransfer').click(function() {
+            $('#sendTransfer').click(function() {
                 var dollars = $('input[type=number][name=tmoneyinput]').val();
                 var golds = $('input[type=number][name=tgoldinput]').val();
                 var reason = $('input[type=text][name=reason]').val();
-                var steamID = $('input[type=text][name=user]').val();
+                var steamID = $("#users").children("option:selected").val();
                 var isInstant = document.getElementById("instantBox").checked;
-
-                if (!names && names.length < 3) {
-                    console.log("Vacia");
-                    return;
+                console.log(dollars)
+                console.log(golds)
+                console.log(reason)
+                console.log(isInstant)
+                console.log(steamID)
+                if (!dollars) {
+                    dollars = "0";
                 }
-
+                if (!golds) {
+                    golds = "0";
+                }
                 $.post("http://vorp_banks/Transfer", JSON.stringify({
                     steam: steamID,
                     subject: reason,
                     money: dollars,
                     gold: golds,
-                    isntant: isInstant,
+                    isntant: isInstant
                 }));
 
             });
@@ -302,7 +305,12 @@
                     } else if (data.action === "showUsers") {
                         $('#users').html("");
                         data.userList.forEach(element => {
-                            $('#users').append("<option value=\"" + element.steam + "\">" + element.name + "</option>");
+                            console.log(element.name);
+                            console.log(element.steam)
+                            $("#users").append($('<option>', {
+                                value: element.steam,
+                                text: element.name
+                            }));
                         });
                     } else if (data.action === "showTransfers") {
                         $('#transfer-log').html("");
