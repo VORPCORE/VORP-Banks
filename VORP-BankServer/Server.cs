@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using CitizenFX.Core;
 /*PROPERTY OF KLC_BY AVILILLA*/
@@ -19,7 +20,9 @@ namespace VORP_BankServer
             EventHandlers["vorp:registerUserInBank"] += new Action<Player,string>(registerUserInBank);
             Delay(100);
             RegisterEvents();
+
         }
+
         //Parte de las transferencias
         private bool AddMoneyTransference(string steamId, double money, string usedBank,Player targetPlayer)
         {
@@ -91,8 +94,7 @@ namespace VORP_BankServer
         //TODO SI HAY FALLO EN LA TRASFERENCIA VOLVERLE A METER EL DINERO QUE HABIA ENVIADO LA PERSONA EN EL BANCO PARA EVITAR PERDIDAS INECESARIAS
         private void Transference([FromSource]Player source,string steamId,double money,double gold,bool instant,string usedBank,string reason)
         {
-            //Quitarle el dinero al que envia la transferencia
-            //Enviarselo a quien recibe la transferencia
+            //PROBAR QUE A LA HORA DE FALLAR LA TRANSFERENCIA TE DEVUELVA EL DINERO
             bool transferenceDone = false;
             Debug.WriteLine(source.Handle);
             Debug.WriteLine(steamId);
@@ -119,6 +121,10 @@ namespace VORP_BankServer
                     {
                         transferenceDone = true;
                     }
+                    else
+                    {
+                        Database.Banks[usedBank].AddUserMoney(source.Identifiers["steam"], money);
+                    }
                 }
             }
             if (gold > 0)
@@ -128,6 +134,10 @@ namespace VORP_BankServer
                     if (AddGoldTransference(steamId, gold, usedBank, TargetPlayer))
                     {
                         transferenceDone = true;
+                    }
+                    else
+                    {
+                        Database.Banks[usedBank].AddUserGold(source.Identifiers["steam"], gold);
                     }
                 }
             }

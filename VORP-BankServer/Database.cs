@@ -10,7 +10,7 @@ namespace VORP_BankServer
     class Database:BaseScript
     {
         public static Dictionary<string,Bank> Banks = new Dictionary<string, Bank>();
-        
+
         //TODO Get all users in each bank and create dictionary bank using database
         public Database(){
             //Create each bank
