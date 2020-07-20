@@ -15,6 +15,7 @@ namespace VORP_BankServer
         private double _gold;
         private double _money;
         private string _bank;
+        private List<Transaction> _transactions;
 
         public BankUser(string identifier,double gold,double money,string bank,bool newWith)
         {
@@ -28,6 +29,13 @@ namespace VORP_BankServer
                     .execute(
                         $"INSERT INTO bank_users (name,identifier,money,gold) VALUES (?,?,?,?)",new object[] {_bank,_identifier,_money,_gold});
             }
+            _transactions = new List<Transaction>();
+        }
+
+        public List<Transaction> Transactions
+        {
+            get => _transactions;
+            set => _transactions = value;
         }
 
         public string Identifier
