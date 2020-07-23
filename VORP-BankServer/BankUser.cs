@@ -104,6 +104,5 @@ namespace VORP_BankServer
             
         }
         
-        
     }
 }

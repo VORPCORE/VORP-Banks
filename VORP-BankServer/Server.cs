@@ -23,7 +23,52 @@ namespace VORP_BankServer
             EventHandlers["playerConnecting"] += new Action<Player, string, dynamic, dynamic>(OnPlayerConnecting);
             EventHandlers["playerDropped"] += new Action<Player, string>(OnPlayerDropped);
             Delay(100);
-            //RegisterEvents();
+            RegisterEvents();
+        }
+        private void RegisterEvents()
+        {
+            TriggerEvent("vorp:addNewCallBack", "retrieveUserBankInfo", new Action<int, CallbackDelegate, dynamic>((source, cb, args) => {
+                PlayerList pl = new PlayerList();
+                Player p = pl[source];
+                string identifier = "steam:" + p.Identifiers["steam"];
+                if (Database.Banks.ContainsKey(args))
+                {
+                    Dictionary<string,double> userCallback = new Dictionary<string, double>(); 
+                    if (Database.Banks[args].GetUser(identifier) != null)
+                    {
+                        userCallback.Add("money",Database.Banks[args].GetUser(identifier).Money);
+                        userCallback.Add("gold",Database.Banks[args].GetUser(identifier).Gold);
+                        cb(userCallback);
+                    }
+                    else
+                    {
+                        userCallback.Add("money",0.0);
+                        userCallback.Add("gold",0.0);
+                        cb(userCallback);
+                    }
+                }
+            }));
+            TriggerEvent("vorp:addNewCallBack","searchUsers",new Action<int,CallbackDelegate,dynamic>(
+                (source, cb, args) =>
+                {
+                    string argsres = args;
+                    string[] name = argsres.Split(' ');
+                    Exports["ghmattimysql"].execute("SELECT firstname,lastname,identifier FROM characters WHERE firstname LIKE ?", new string[] {"%"+name[0]+"%" } ,new Action<dynamic>((result) =>
+                    {
+                        if(result != null)
+                        {
+                            cb(result);
+                        }
+                    }));
+                }));
+            
+            TriggerEvent("vorp:addNewCallBack","Deposit",new Action<int,CallbackDelegate,dynamic>((source, cb, args) =>
+            {
+                PlayerList pl = new PlayerList();
+                Player p = pl[source];
+                string identifier = "steam:" + p.Identifiers["steam"];
+                
+            }));
         }
 
         private void OnPlayerDropped([FromSource] Player player, string reason)
