@@ -55,16 +55,28 @@ namespace VORP_BankServer
             _gold = gold;
         }
 
-        public void AddMoney(double money)
+        public bool AddMoney(double money)
         {
             double newMoney = money + _money;
             Money = newMoney;
+            if (Money == newMoney)
+            {
+                return true;
+            }
+
+            return false;
         }
 
-        public void AddGold(double gold)
+        public bool AddGold(double gold)
         {
             double newGold = gold + _gold;
             Gold = newGold;
+            if (Gold == newGold)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         public bool SubMoney(double money)
