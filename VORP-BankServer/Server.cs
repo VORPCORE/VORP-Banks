@@ -10,6 +10,7 @@ namespace VORP_BankServer
 {
     public class Server : BaseScript
     {
+        public static List<Player> _connectedPlayers = new List<Player>();
         public Server()
         {
             // EventHandlers["vorp:bankAddMoney"] += new Action<Player, string, double, string>(addMoney);
@@ -27,16 +28,18 @@ namespace VORP_BankServer
 
         private void OnPlayerDropped([FromSource] Player player, string reason)
         {
+            _connectedPlayers.Remove(player);
             string steamId = player.Identifiers["steam"];
             foreach (KeyValuePair<string, Bank> bank in Database.Banks)
             {
-                //bank.Value.DeleteUser(steamId);
+                bank.Value.RemoveUser(steamId);
             }
         }
 
         private void OnPlayerConnecting([FromSource] Player player, string playerName, dynamic setKickReason,
             dynamic deferrals)
         {
+            _connectedPlayers.Add(player);
             string steamId = player.Identifiers["steam"];
             Exports["ghmattimysql"].execute("SELECT * FROM bank_users WHERE identifier = ?", new object[] {steamId},
                 new Action<dynamic>((aresult) =>

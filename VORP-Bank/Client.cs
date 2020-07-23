@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using CitizenFX.Core;
@@ -30,8 +31,7 @@ namespace VORP_BankClient
             Debug.WriteLine("Loading banks where user is registered");
         }
 
-
-        [Tick]
+        
         private async Task OnBank()
         {
             if (!GetConfig.IsLoaded) return;

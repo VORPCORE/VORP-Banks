@@ -23,6 +23,19 @@ namespace VORP_BankServer
             this._name = name;
         }
 
+        private bool IsUserConnected(string steamId)
+        {
+            foreach (Player player in Server._connectedPlayers)
+            {
+                if (player.Identifiers["steam"] == steamId)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         //PRE: identifier not null
         //POST: return isRegistered and register it on database if not
         private bool IsUserRegistered(string identifier)
@@ -64,7 +77,6 @@ namespace VORP_BankServer
                 done = SubUserMoney(fromSteamId, money);
                 if (done) done = AddUserMoney(toSteamId, money);
                 if (!done){ AddUserMoney(fromSteamId, money); return false;}
-                
             }
 
             if (gold > 0.0)
@@ -75,6 +87,47 @@ namespace VORP_BankServer
             }
 
             return done;
+        }
+
+        public void Withdraw([FromSource]Player source, double money, double gold)
+        {
+            if (money > 0)
+            {
+                if (SubUserMoney(source.Identifiers["steam"], money))
+                {
+                    TriggerEvent("vorp:addMoney", int.Parse(source.Handle), 0, money);
+                    //Evento que actualiza el banco
+                }
+            }
+
+            if (gold > 0)
+            {
+                if (SubUserGold(source.Identifiers["steam"], gold))
+                {
+                    TriggerEvent("vorp:addMoney", int.Parse(source.Handle), 1, gold);
+                    //Evento que actualiza el banco
+                }
+            }
+        }
+
+        public void Deposit([FromSource]Player source, double money, double gold)
+        {
+            TriggerEvent("vorp:getCharacter", int.Parse(source.Handle), new Action<dynamic>((user) =>
+            {
+                double newMoney = user.money - money;
+                double newGold = user.gold - gold;
+                if (newMoney >= 0)
+                {
+                    TriggerEvent("vorp:removeMoney", source, 0, money);
+                    AddUserMoney(source.Identifiers["steam"], money);
+                }
+
+                if (newGold >= 0)
+                {
+                    TriggerEvent("vorp:removeMoney", source, 1, gold);
+                    AddUserGold(source.Identifiers["steam"], gold);
+                }
+            }));
         }
 
         public bool AddUser(BankUser newUser)
@@ -124,6 +177,11 @@ namespace VORP_BankServer
                     $"UPDATE bank_users SET money = money + ? WHERE identifier=? and name = ?",
                     new object[]{money,steamId,_name}
                 );
+                if (IsUserConnected(steamId))
+                {
+                    BankUser newUser = new BankUser(Name,steamId,money,0.0);
+                    _bankUsers.Add(steamId,newUser);
+                }
                 return true;
             }
 
@@ -156,6 +214,11 @@ namespace VORP_BankServer
                     $"UPDATE bank_users SET gold = gold + ? WHERE identifier=? and name = ?",
                     new object[]{gold,steamId,_name}
                 );
+                if (IsUserConnected(steamId))
+                {
+                    BankUser newUser = new BankUser(Name,steamId,0.0,gold);
+                    _bankUsers.Add(steamId,newUser);
+                }
                 return true;
             }
 
