@@ -1,157 +1,60 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using CitizenFX.Core;
+﻿using CitizenFX.Core;
 
-/*PROPERTY OF KLC_BY AVILILLA*/
 namespace VORP_BankServer
 {
     public class BankUser:BaseScript
     {
-        private string _identifier;
-        private double _gold;
-        private double _money;
         private string _bank;
-        private List<Transaction> _transactions;
+        private string _identifier;
+        private double _money;
+        private double _gold;
 
-        public BankUser(string identifier,double gold,double money,string bank,bool newWith)
+        public string Bank
         {
-            _gold = gold;
-            _identifier = identifier;
-            _money = money;
-            _bank = bank;
-            if (newWith)
-            {
-                Exports["ghmattimysql"]
-                    .execute(
-                        $"INSERT INTO bank_users (name,identifier,money,gold) VALUES (?,?,?,?)",new object[] {_bank,_identifier,_money,_gold});
-            }
-            _transactions = new List<Transaction>();
-        }
-
-        public List<Transaction> Transactions
-        {
-            get => _transactions;
-            set => _transactions = value;
+            get => _bank;
+            set => _bank = value;
         }
 
         public string Identifier
         {
             get => _identifier;
-            set
-            {
-                if (value != null)
-                {
-                    _identifier = value;
-                }
-            }
-        }
-        
-        public double Gold
-        {
-            get => _gold;
-            set { _gold = value;}
+            set => _identifier = value;
         }
 
         public double Money
         {
             get => _money;
-            set { _money = value; }
-        }
-
-        public void AddMoney(double money)
-        {
-            if (money >= 0)
+            set
             {
-                _money += money;
-                UpdateUser(money,"money","add");
+                _money = value;
+                Exports["ghmattimysql"].execute(
+                    $"UPDATE bank_users SET money = ? WHERE identifier=? and name =?;",
+                    new object[]{value,_identifier,_bank}
+                );
             }
         }
 
-        public void AddGold(double gold)
+        public double Gold
         {
-            if (gold >= 0)
+            get => _gold;
+            set
             {
-                _gold += gold;
-                UpdateUser(gold,"gold","add");
+                _gold = value;
+                Exports["ghmattimysql"].execute(
+                    $"UPDATE bank_users SET gold = ? WHERE identifier=? and name =?;",
+                    new object[]{value,_identifier,_bank}
+                );
             }
         }
 
-        public bool SubMoney(double money)
+        public BankUser(string bank,string identifier,double money,double gold)
         {
-            if (money >= 0)
-            {
-                if (_money >= money)
-                {
-                    _money -= money;
-                    UpdateUser(money,"money","sub");
-                    return true;
-                }
-                else return false;
-            }
-            else return false;
+            _bank = bank;
+            _identifier = identifier;
+            _money = money;
+            _gold = gold;
         }
         
-        public bool SubGold(double gold)
-        {
-            if (gold >= 0)
-            {
-                if (_gold >= gold)
-                {
-                    _gold -= gold;
-                    UpdateUser(gold,"gold","sub");
-                    return true;
-                }
-                else return false;
-            }
-            else return false;
-        }
-
-        public void UpdateUser(double cuantity,string type,string type2)
-        {
-            switch (type)
-            {
-                case "money":
-                    switch (type2)
-                    {
-                        case "add":
-                            Exports["ghmattimysql"]
-                                .execute(
-                                    $"UPDATE bank_users SET money = money+'{cuantity}' WHERE identifier=? and name =?;",
-                                    new object[]{ _identifier,_bank});
-                            break;
-                        case "sub":
-                            Exports["ghmattimysql"]
-                                .execute(
-                                    $"UPDATE bank_users SET money = money-'{cuantity}' WHERE identifier=? and name =?;",
-                                    new object[] { _identifier,_bank});
-                            break;
-                    }
-                    break;
-                case "gold":
-                    switch (type2)
-                    {
-                        case "add":
-                            Exports["ghmattimysql"]
-                                .execute(
-                                    $"UPDATE bank_users SET gold = gold+'{cuantity}' WHERE identifier=? and name =?;",
-                                    new object[]{ _identifier,_bank});
-                            break;
-                        case "sub":
-                            Exports["ghmattimysql"]
-                                .execute(
-                                    $"UPDATE bank_users SET gold = gold-'{cuantity}' WHERE identifier=? and name =?;",
-                                    new object[]{ _identifier,_bank});
-                            break;
-                    } 
-                    break;
-                default:
-                    Debug.WriteLine("Error al intentar setear en base de datos");
-                    break;
-            }
-        }
+        
     }
 }
