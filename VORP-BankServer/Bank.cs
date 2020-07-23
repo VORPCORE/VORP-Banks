@@ -62,6 +62,14 @@ namespace VORP_BankServer
             }
         }
 
+        public void DeleteUser(string identifier)
+        {
+            if (bankUsers.ContainsKey(identifier))
+            {
+                bankUsers.Remove(identifier);
+            }
+        }
+
         public BankUser GetUser(string identifier){
             if(bankUsers.ContainsKey(identifier)){
                 return bankUsers[identifier];

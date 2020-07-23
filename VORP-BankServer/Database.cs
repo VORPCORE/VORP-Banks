@@ -26,25 +26,25 @@ namespace VORP_BankServer
                         Banks.Add(bank.name.ToString(),new Bank(bank.name.ToString()));
                         Debug.WriteLine($"Added :{bank.name} with {bank.money} money and {bank.gold} gold");
                     }
-                    if (Banks.Count > 0)
-                    {
-                        Exports["ghmattimysql"].execute("SELECT * FROM bank_users", new Action<dynamic>((aresult) => {
-                            if (aresult != null)
-                            {
-                                foreach (dynamic user in aresult)
-                                {
-                                    if (user != null)
-                                    {
-                                        if (Banks.ContainsKey(user.name.ToString()))
-                                        {
-                                            Bank aux = Banks[user.name.ToString()];
-                                            aux.AddUser(new BankUser(user.identifier.ToString(),double.Parse(user.gold.ToString()), double.Parse(user.money.ToString()),aux.GetName(),false));
-                                        }
-                                    }
-                                }
-                            }
-                        }));
-                    }
+                    // if (Banks.Count > 0)
+                    // {
+                    //     Exports["ghmattimysql"].execute("SELECT * FROM bank_users", new Action<dynamic>((aresult) => {
+                    //         if (aresult != null)
+                    //         {
+                    //             foreach (dynamic user in aresult)
+                    //             {
+                    //                 if (user != null)
+                    //                 {
+                    //                     if (Banks.ContainsKey(user.name.ToString()))
+                    //                     {
+                    //                         Bank aux = Banks[user.name.ToString()];
+                    //                         aux.AddUser(new BankUser(user.identifier.ToString(),double.Parse(user.gold.ToString()), double.Parse(user.money.ToString()),aux.GetName(),false));
+                    //                     }
+                    //                 }
+                    //             }
+                    //         }
+                    //     }));
+                    // }
                 }
             }));
         }

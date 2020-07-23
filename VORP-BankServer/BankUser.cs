@@ -121,13 +121,13 @@ namespace VORP_BankServer
                             Exports["ghmattimysql"]
                                 .execute(
                                     $"UPDATE bank_users SET money = money+'{cuantity}' WHERE identifier=? and name =?;",
-                                    new[] { _identifier,_bank});
+                                    new object[]{ _identifier,_bank});
                             break;
                         case "sub":
                             Exports["ghmattimysql"]
                                 .execute(
                                     $"UPDATE bank_users SET money = money-'{cuantity}' WHERE identifier=? and name =?;",
-                                    new[] { _identifier,_bank});
+                                    new object[] { _identifier,_bank});
                             break;
                     }
                     break;
@@ -138,13 +138,13 @@ namespace VORP_BankServer
                             Exports["ghmattimysql"]
                                 .execute(
                                     $"UPDATE bank_users SET gold = gold+'{cuantity}' WHERE identifier=? and name =?;",
-                                    new[] { _identifier,_bank});
+                                    new object[]{ _identifier,_bank});
                             break;
                         case "sub":
                             Exports["ghmattimysql"]
                                 .execute(
                                     $"UPDATE bank_users SET gold = gold-'{cuantity}' WHERE identifier=? and name =?;",
-                                    new[] { _identifier,_bank});
+                                    new object[]{ _identifier,_bank});
                             break;
                     } 
                     break;
