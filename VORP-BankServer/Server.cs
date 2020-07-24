@@ -5,14 +5,17 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using CitizenFX.Core;
+using CitizenFX.Core.Native;
+
 /*PROPERTY OF KLC_BY AVILILLA*/
 namespace VORP_BankServer
 {
     public class Server : BaseScript
     {
-        public static List<Player> _connectedPlayers = new List<Player>();
         public Server()
         {
+            EventHandlers["vorp:bankDeposit"] += new Action<Player,string,double,double>(Deposit);
+            EventHandlers["vorp:bankWithdraw"] += new Action<Player,string,double,double>(Withdraw);
             // EventHandlers["vorp:bankAddMoney"] += new Action<Player, string, double, string>(addMoney);
             // EventHandlers["vorp:bankAddGold"] += new Action<Player, string, double, string>(addGold);
             // EventHandlers["vorp:bankSubMoney"] += new Action<Player, string, double, string>(subMoney);
@@ -20,11 +23,11 @@ namespace VORP_BankServer
             // EventHandlers["vorp:userTransference"] +=
             //     new Action<Player, string, double, double, bool, string, string>(Transference);
             // EventHandlers["vorp:registerUserInBank"] += new Action<Player, string>(registerUserInBank);
-            EventHandlers["playerConnecting"] += new Action<Player, string, dynamic, dynamic>(OnPlayerConnecting);
-            EventHandlers["playerDropped"] += new Action<Player, string>(OnPlayerDropped);
             Delay(100);
             RegisterEvents();
         }
+        
+        
         private void RegisterEvents()
         {
             TriggerEvent("vorp:addNewCallBack", "retrieveUserBankInfo", new Action<int, CallbackDelegate, dynamic>((source, cb, args) => {
@@ -61,51 +64,24 @@ namespace VORP_BankServer
                         }
                     }));
                 }));
-            
-            TriggerEvent("vorp:addNewCallBack","Deposit",new Action<int,CallbackDelegate,dynamic>((source, cb, args) =>
-            {
-                PlayerList pl = new PlayerList();
-                Player p = pl[source];
-                string identifier = "steam:" + p.Identifiers["steam"];
-                
-            }));
         }
 
-        private void OnPlayerDropped([FromSource] Player player, string reason)
+        private void Withdraw([FromSource] Player source, string bank, double money, double gold)
         {
-            _connectedPlayers.Remove(player);
-            string steamId = player.Identifiers["steam"];
-            foreach (KeyValuePair<string, Bank> bank in Database.Banks)
+            if (Database.Banks.ContainsKey(bank))
             {
-                bank.Value.RemoveUser(steamId);
+                Database.Banks[bank].Withdraw(source,money,gold);
+            }
+        }
+        
+        private void Deposit([FromSource] Player source, string bank, double money, double gold)
+        {
+            if (Database.Banks.ContainsKey(bank))
+            {
+                Database.Banks[bank].Deposit(source,money,gold);
             }
         }
 
-        private void OnPlayerConnecting([FromSource] Player player, string playerName, dynamic setKickReason,
-            dynamic deferrals)
-        {
-            _connectedPlayers.Add(player);
-            string steamId = player.Identifiers["steam"];
-            Exports["ghmattimysql"].execute("SELECT * FROM bank_users WHERE identifier = ?", new object[] {steamId},
-                new Action<dynamic>((aresult) =>
-                {
-                    if (aresult != null)
-                    {
-                        foreach (dynamic user in aresult)
-                        {
-                            if (user != null)
-                            {
-                                if (Database.Banks.ContainsKey(user.name.ToString()))
-                                {
-                                    Bank aux = Database.Banks[user.name.ToString()];
-                                    aux.AddUser(new BankUser(aux.Name,
-                                        user.identifier.ToString(),double.Parse(user.gold.ToString()), 
-                                        double.Parse(user.money.ToString())));
-                                }
-                            }
-                        }
-                    }
-                }));
-        }
+        
     }
 }

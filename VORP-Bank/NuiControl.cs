@@ -64,17 +64,8 @@ namespace VORP_Bank
                 Debug.WriteLine(data.ToString());
                 double money = data["money"].ToObject<double>();
                 double gold = data["gold"].ToObject<double>();
-                if (money > 0.0)
-                {
-                    TriggerServerEvent("vorp:bankSubMoney",Client.UsedBank,money,"withdraw");
-                }
-
-                if (gold > 0.0)
-                {
-                    TriggerServerEvent("vorp:bankSubGold", Client.UsedBank,gold,"withdraw");
-                }
+                TriggerServerEvent("vorp:bankWithdraw",Client.UsedBank,money,gold);
                 //uno de los dos o los dos pueden tener valor si no tuvieran devuelven 0 
-
             }
         }
 
