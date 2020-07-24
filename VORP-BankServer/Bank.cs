@@ -40,8 +40,9 @@ namespace VORP_BankServer
 
         //PRE: identifier not null
         //POST: return isRegistered and register it on database if not
-        private void IsUserRegistered(string identifier,double money,double gold)
+        private async Task<bool> IsUserRegistered(string identifier)
         {
+            bool resultado = false;
             Exports["ghmattimysql"].execute("SELECT * FROM bank_users WHERE identifier = ? AND `name` = ?",
                 new object[] {identifier,Name},
                 new Action<dynamic>((result) =>
@@ -58,30 +59,17 @@ namespace VORP_BankServer
                                     if (result2 != null)
                                     {
                                         Debug.WriteLine("Lo he registrado en bd");
-                                        Exports["ghmattimysql"].execute(
-                                            $"UPDATE bank_users SET gold = gold + ? WHERE identifier=? and name = ?",
-                                            new object[]{gold,identifier,_name}
-                                        );
-                                        Exports["ghmattimysql"].execute(
-                                            $"UPDATE bank_users SET money = money + ? WHERE identifier=? and name = ?",
-                                            new object[]{money,identifier,_name}
-                                        );
+                                        resultado = true;
                                     }
                                 }));
                         }
                         else
                         {
-                            Exports["ghmattimysql"].execute(
-                                $"UPDATE bank_users SET gold = gold + ? WHERE identifier=? and name = ?",
-                                new object[]{gold,identifier,_name}
-                            );
-                            Exports["ghmattimysql"].execute(
-                                $"UPDATE bank_users SET money = money + ? WHERE identifier=? and name = ?",
-                                new object[]{money,identifier,_name}
-                            );
+                            resultado = true;
                         }
                     }
                 }));
+            return resultado;
         }
 
         public bool Transference(string fromSteamId, string toSteamId, double gold, double money)
@@ -98,15 +86,15 @@ namespace VORP_BankServer
             if (money > 0.0)
             {
                 done = SubUserMoney(fromSteamId, money);
-                if (done) done = AddUserMoney(toSteamId, money);
-                if (!done){ AddUserMoney(fromSteamId, money); return false;}
+                if (done) done =  AddUserMoney(toSteamId, money);
+                if (!done){  AddUserMoney(fromSteamId, money); return false;}
             }
 
             if (gold > 0.0)
             {
                 done = SubUserGold(fromSteamId, gold);
-                if (done) done = AddUserGold(toSteamId, gold);
-                if (!done) {AddUserGold(fromSteamId, gold); return false; }
+                if (done) done =  AddUserGold(toSteamId, gold);
+                if (!done) { AddUserGold(fromSteamId, gold); return false; }
             }
 
             if (from != null)
@@ -147,26 +135,64 @@ namespace VORP_BankServer
                 _bankUsers["steam:"+source.Identifiers["steam"]].Gold);
         }
 
-        public void Deposit([FromSource]Player source, double money, double gold)
+        public async void Deposit([FromSource]Player source, double money, double gold)
         {
             TriggerEvent("vorp:getCharacter", int.Parse(source.Handle), new Action<dynamic>((user) =>
             {
                 double newMoney = user.money - money;
                 double newGold = user.gold - gold;
                 string steamId = "steam:" + source.Identifiers["steam"];
-                if (newMoney >= 0)
-                {
-                    TriggerEvent("vorp:removeMoney", int.Parse(source.Handle), 0, money);
-                    AddUserMoney("steam:"+source.Identifiers["steam"], money);
-                }
+                Exports["ghmattimysql"].execute("SELECT * FROM bank_users WHERE identifier = ? AND `name` = ?",
+                    new object[] {steamId,Name},
+                    new Action<dynamic>((result) =>
+                    {
+                        if (result != null)
+                        {
+                            if (result.Count <= 0)
+                            {
+                                Debug.WriteLine("Entro a registrarlo porque es nuevo");
+                                Exports["ghmattimysql"].execute("INSERT INTO bank_users (`name`,`identifier`,`money`,`gold`) VALUES (?,?,?,?)",
+                                    new object[] {Name,steamId,0.0,0.0},
+                                    new Action<dynamic>((result2) =>
+                                    {
+                                        if (result2 != null)
+                                        {
+                                            Debug.WriteLine("Lo he registrado en bd");
+                                            if (newMoney >= 0)
+                                            {
+                                                TriggerEvent("vorp:removeMoney", int.Parse(source.Handle), 0, money);
+                                                AddUserMoney("steam:"+source.Identifiers["steam"], money);
+                                            }
                 
-                if (newGold >= 0)
-                {
-                    TriggerEvent("vorp:removeMoney", int.Parse(source.Handle), 1, gold);
-                    AddUserGold("steam:"+source.Identifiers["steam"], gold);
-                }
-                source.TriggerEvent("vorp:refreshBank",_bankUsers[steamId].Money,
-                    _bankUsers[steamId].Gold);
+                                            if (newGold >= 0)
+                                            {
+                                                TriggerEvent("vorp:removeMoney", int.Parse(source.Handle), 1, gold);
+                                                AddUserGold("steam:"+source.Identifiers["steam"], gold);
+                                            }
+                                            source.TriggerEvent("vorp:refreshBank",_bankUsers[steamId].Money,
+                                                _bankUsers[steamId].Gold);
+                                        }
+                                    }));
+                            }
+                            else
+                            {
+                                if (newMoney >= 0)
+                                {
+                                    TriggerEvent("vorp:removeMoney", int.Parse(source.Handle), 0, money);
+                                    AddUserMoney("steam:"+source.Identifiers["steam"], money);
+                                }
+                
+                                if (newGold >= 0)
+                                {
+                                    TriggerEvent("vorp:removeMoney", int.Parse(source.Handle), 1, gold);
+                                    AddUserGold("steam:"+source.Identifiers["steam"], gold);
+                                }
+                                source.TriggerEvent("vorp:refreshBank",_bankUsers[steamId].Money,
+                                    _bankUsers[steamId].Gold);
+                            }
+                        }
+                    }));
+                
             }));
         }
 
@@ -210,9 +236,10 @@ namespace VORP_BankServer
             {
                 return _bankUsers[steamId].AddMoney(money);
             }
-
-
-            IsUserRegistered(steamId,money,0.0);
+            Exports["ghmattimysql"].execute(
+                $"UPDATE bank_users SET money = money + ? WHERE identifier=? and name = ?",
+                new object[]{money,steamId,_name}
+            );
             Debug.WriteLine("entro en dinero");
             if (IsUserConnected(steamId))
             {
@@ -240,8 +267,11 @@ namespace VORP_BankServer
             {
                 return _bankUsers[steamId].AddGold(gold);
             }
-
-            IsUserRegistered(steamId,0.0,gold);
+            
+            Exports["ghmattimysql"].execute(
+                $"UPDATE bank_users SET gold = gold + ? WHERE identifier=? and name = ?",
+                new object[]{gold,steamId,_name}
+            );
             Debug.WriteLine("entro en oro");
                 
             if (IsUserConnected(steamId))
