@@ -1,5 +1,7 @@
 ﻿{
   "time": 30,
+  "transferenceCost": 10,
+  "defaultlang": "Es",
   "Banks": [
     {
       "name": "SaintDenis", //Dont touch

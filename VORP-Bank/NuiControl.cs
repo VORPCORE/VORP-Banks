@@ -110,7 +110,7 @@ namespace VORP_Bank
                 double gold = double.Parse(data["gold"].ToString());
                 bool useInstantTax = data["instant"].ToObject<bool>();
                 string subject = data["subject"].ToString();
-                TriggerServerEvent("vorp:userTransference", steamId, money, gold, useInstantTax,Client.UsedBank,subject);
+                TriggerServerEvent("vorp:bankTrasference", steamId, money, gold, useInstantTax,Client.UsedBank,subject);
             }
         }
 

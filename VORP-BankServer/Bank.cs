@@ -29,7 +29,7 @@ namespace VORP_BankServer
             this._name = name;
         }
 
-        private bool IsUserConnected(string steamId)
+        public static bool IsUserConnected(string steamId)
         {
             PlayerList playerList = new PlayerList();
             foreach (Player player in playerList)
@@ -45,16 +45,23 @@ namespace VORP_BankServer
 
         public void Transference(Player playerSend, string toSteamId, double gold, double money,bool instant,string subject)
         {
-            //TransferenceC newTransference = new TransferenceC("steam:"+playerSend.Identifiers["steam"],toSteamId,money,gold,subject,Name,Name,LoadConfig.Config["time"].ToObject<int>());
-
-            if ( instant)
+            string steam = "steam:" + playerSend.Identifiers["steam"];
+            if (instant) money += LoadConfig.Config["transferenceCost"].ToObject<double>();
+            if (_bankUsers[steam].SubMoney(money) && _bankUsers[steam].SubGold(money))
             {
-                
-                
-            }
-            else
-            {
-                //Server.TransferenceList.Add(newTransference);
+                TransferenceC newTransference = new TransferenceC("steam:"+playerSend.Identifiers["steam"],toSteamId,money,gold,subject,Name,Name,LoadConfig.Config["time"].ToObject<int>(),this);
+                if (instant)
+                {
+                    newTransference.MakeTransference();
+                    playerSend.TriggerEvent("vorp:refreshBank",_bankUsers[steam].Money,
+                        _bankUsers[steam].Gold);
+                }
+                else
+                {
+                    if(IsUserConnected(steam)) playerSend.TriggerEvent("vorp:refreshBank",_bankUsers[steam].Money,
+                        _bankUsers[steam].Gold);
+                    Server.TransferenceList.Add(newTransference);
+                }
             }
         }
 

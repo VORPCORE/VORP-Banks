@@ -1,4 +1,5 @@
-﻿using CitizenFX.Core;
+﻿using System.Collections.Generic;
+using CitizenFX.Core;
 
 namespace VORP_BankServer
 {
@@ -8,6 +9,22 @@ namespace VORP_BankServer
         private string _identifier;
         private double _money;
         private double _gold;
+        
+        private List<Transference> _transferences = new List<Transference>();
+        public struct Transference
+        {
+            public string date;
+            public double money;
+            public string subject;
+            public string operation;
+            public double gold;
+        }
+
+        public List<Transference> Transferences
+        {
+            get => _transferences;
+            set => _transferences = value;
+        }
 
         public string Bank
         {

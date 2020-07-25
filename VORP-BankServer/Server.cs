@@ -29,12 +29,14 @@ namespace VORP_BankServer
             // EventHandlers["vorp:registerUserInBank"] += new Action<Player, string>(registerUserInBank);
             Delay(100);
             RegisterEvents();
+            Tick += ExecuteTransaction;
         }
 
         private void Transference([FromSource] Player player, string toSteamId, double money, double gold,bool instantTak,string usedBank,string subject)
         {
             if (Database.Banks.ContainsKey(usedBank))
             {
+                Debug.WriteLine("Ha hacer la transferencia");
                 Database.Banks[usedBank].Transference(player, toSteamId, gold, money,instantTak,subject);
             }
         }
@@ -42,18 +44,20 @@ namespace VORP_BankServer
         private async Task ExecuteTransaction()
         {
             await Delay(1000);
-            foreach (TransferenceC transference in TransferenceList)
+            List<TransferenceC> auxTransference = TransferenceList.ToList();
+            for (int i = 0;i<auxTransference.Count;i++)
             {
-                if (transference.Time == 0)
+                if (auxTransference[i].Time == 0)
                 {
-                    //Aqui se haria la consulta de base de datos para hacer la transferencia
-                    TransferenceList.Remove(transference);
+                    auxTransference[i].MakeTransference();
+                    TransferenceList.RemoveAt(i);
                 }
                 else
                 {
-                    transference.RestTime();
+                    auxTransference[i].RestTime();
                 }
             }
+            
         }
         
         

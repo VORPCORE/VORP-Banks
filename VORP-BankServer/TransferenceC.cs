@@ -68,6 +68,7 @@ namespace VORP_BankServer
             get => _toIdentifier;
             set => _toIdentifier = value;
         }
+        
 
         public TransferenceC(string fromIdentifier, string toIdentifier, double money, double gold,
             string subject, string bankto, string bank, int time,Bank banco)
@@ -88,106 +89,151 @@ namespace VORP_BankServer
             Time = Time - 1;
         }
 
-        public void MakeTransference(Player playerSend)
+        public void MakeTransference()
         {
-            PlayerList playerList = new PlayerList();
-            Player from = playerSend;
-            Player to = null;
-            foreach (Player player in playerList)
+            Exports["ghmattimysql"].execute("SELECT * FROM bank_users WHERE identifier = ? AND `name` = ?",
+            new object[] {ToIdentifier, Banco.Name},
+            new Action<dynamic>((result) =>
             {
-                if ("steam:"+player.Identifiers["steam"] == ToIdentifier) to = player;
-            }
-            bool done = false;
-            bool done2 = true;
-            if (Money > 0.0)
-            {
-                done = Banco.SubUserMoney(FromIdentifier, Money);
-                if (done)
+                if (result != null)
                 {
-                    Exports["ghmattimysql"].execute("SELECT * FROM bank_users WHERE identifier = ? AND `name` = ?",
-                        new object[] {ToIdentifier, Banco.Name},
-                        new Action<dynamic>((result) =>
-                        {
-                            if (result != null)
+                    if (result.Count <= 0)
+                    {
+                        Debug.WriteLine("Entro a registrarlo porque es nuevo");
+                        
+                        Exports["ghmattimysql"].execute(
+                            "INSERT INTO bank_users (`name`,`identifier`,`money`,`gold`) VALUES (?,?,?,?)",
+                            new object[] {Bank, ToIdentifier, Money, Gold},
+                            new Action<dynamic>((result2) =>
                             {
-                                if (result.Count <= 0)
-                                {
-                                    Debug.WriteLine("Entro a registrarlo porque es nuevo");
-                                    Exports["ghmattimysql"].execute(
-                                        "INSERT INTO bank_users (`name`,`identifier`,`money`,`gold`) VALUES (?,?,?,?)",
-                                        new object[] {Bank, ToIdentifier, 0.0, 0.0},
-                                        new Action<dynamic>((result2) =>
-                                        {
-                                            if (result2 != null)
-                                            {
-                                                Debug.WriteLine("Lo he registrado en bd");
-                                                done2 =  Banco.AddUserMoney(ToIdentifier, Money);
-                                            }
-                                        }));
-                                }
-                                else
-                                {
-                                    done2 =  Banco.AddUserMoney(ToIdentifier,Money);
-                                }
-                            }
-                        }));
-                }
-
-                if (!done2)
-                {
-                    Banco.AddUserMoney(FromIdentifier, Money);
-                }
-            }
-
-            done = false;
-            done2 = true;
-            if (Gold > 0.0)
-            {
-                done = Banco.SubUserGold(FromIdentifier, Gold);
-                if (done)
-                {
-                    Exports["ghmattimysql"].execute("SELECT * FROM bank_users WHERE identifier = ? AND `name` = ?",
-                        new object[] {ToIdentifier, Banco.Name},
-                        new Action<dynamic>((result) =>
-                        {
-                            if (result != null)
+                                Exports["ghmattimysql"].execute(
+                                    "INSERT INTO transactions (`bank`,`fromIdentifier`,`toIdentifier`,`money`,`gold`,`date`,`reason`,`bankto`) VALUES (?,?,?,?,?,CURDATE(),?,?)",
+                                    new object[] {Bank, FromIdentifier,ToIdentifier, Money, Gold,Subject,BankTo},
+                                    new Action<dynamic>((result4) =>
+                                    {
+                                    }));
+                            }));
+                    }
+                    else
+                    {
+                        Exports["ghmattimysql"].execute(
+                            "UPDATE bank_users SET money = money+? , gold = gold+?  WHERE `identifier` = ? AND `name` = ?",
+                            new object[] {Money,Gold,ToIdentifier, Banco.Name}, new Action<dynamic>((result3) =>
                             {
-                                if (result.Count <= 0)
-                                {
-                                    Debug.WriteLine("Entro a registrarlo porque es nuevo");
-                                    Exports["ghmattimysql"].execute(
-                                        "INSERT INTO bank_users (`name`,`identifier`,`money`,`gold`) VALUES (?,?,?,?)",
-                                        new object[] {Banco.Name, ToIdentifier, 0.0, 0.0},
-                                        new Action<dynamic>((result2) =>
-                                        {
-                                            if (result2 != null)
-                                            {
-                                                Debug.WriteLine("Lo he registrado en bd");
-                                                done2 =  Banco.AddUserGold(ToIdentifier, Gold);
-                                            }
-                                        }));
-                                }
-                                else
-                                {
-                                    done2 =  Banco.AddUserGold(ToIdentifier, Gold);
-                                }
-                            }
-                        }));
+                                
+                            }));
+                        Exports["ghmattimysql"].execute(
+                            "INSERT INTO transactions (`bank`,`fromIdentifier`,`toIdentifier`,`money`,`gold`,`date`,`reason`,`bankto`) VALUES (?,?,?,?,?,CURDATE(),?,?)",
+                            new object[] {Bank, FromIdentifier,ToIdentifier, Money, Gold,Subject,BankTo},
+                            new Action<dynamic>((result2) =>
+                            {
+                            }));
+                    }
                 }
-                if (!done2) { Banco.AddUserGold(FromIdentifier, Gold);}
-            }
-
-            if (from != null)
-            {
-                from.TriggerEvent("vorp:refreshBank",Banco.BankUsers["steam:"+from.Identifiers["steam"]].Money,
-                    Banco.BankUsers["steam:"+from.Identifiers["steam"]].Gold);
-            }
-
-            if (to != null)
-            {
-                to.TriggerEvent("vorp:refreshBank",Banco.BankUsers["steam:"+to.Identifiers["steam"]].Money,
-                    Banco.BankUsers["steam:"+to.Identifiers["steam"]].Gold);
-            }
+            }));
         }
+        
+
+        // public void MakeTransference(Player playerSend)
+        // {
+        //     PlayerList playerList = new PlayerList();
+        //     Player from = playerSend;
+        //     Player to = null;
+        //     foreach (Player player in playerList)
+        //     {
+        //         if ("steam:"+player.Identifiers["steam"] == ToIdentifier) to = player;
+        //     }
+        //     bool done = false;
+        //     bool done2 = true;
+        //     if (Money > 0.0)
+        //     {
+        //         done = Banco.SubUserMoney(FromIdentifier, Money);
+        //         if (done)
+        //         {
+        //             Exports["ghmattimysql"].execute("SELECT * FROM bank_users WHERE identifier = ? AND `name` = ?",
+        //                 new object[] {ToIdentifier, Banco.Name},
+        //                 new Action<dynamic>((result) =>
+        //                 {
+        //                     if (result != null)
+        //                     {
+        //                         if (result.Count <= 0)
+        //                         {
+        //                             Debug.WriteLine("Entro a registrarlo porque es nuevo");
+        //                             Exports["ghmattimysql"].execute(
+        //                                 "INSERT INTO bank_users (`name`,`identifier`,`money`,`gold`) VALUES (?,?,?,?)",
+        //                                 new object[] {Bank, ToIdentifier, 0.0, 0.0},
+        //                                 new Action<dynamic>((result2) =>
+        //                                 {
+        //                                     if (result2 != null)
+        //                                     {
+        //                                         Debug.WriteLine("Lo he registrado en bd");
+        //                                         done2 =  Banco.AddUserMoney(ToIdentifier, Money);
+        //                                     }
+        //                                 }));
+        //                         }
+        //                         else
+        //                         {
+        //                             done2 =  Banco.AddUserMoney(ToIdentifier,Money);
+        //                         }
+        //                     }
+        //                 }));
+        //         }
+        //
+        //         if (!done2)
+        //         {
+        //             Banco.AddUserMoney(FromIdentifier, Money);
+        //         }
+        //     }
+        //
+        //     done = false;
+        //     done2 = true;
+        //     if (Gold > 0.0)
+        //     {
+        //         done = Banco.SubUserGold(FromIdentifier, Gold);
+        //         if (done)
+        //         {
+        //             Exports["ghmattimysql"].execute("SELECT * FROM bank_users WHERE identifier = ? AND `name` = ?",
+        //                 new object[] {ToIdentifier, Banco.Name},
+        //                 new Action<dynamic>((result) =>
+        //                 {
+        //                     if (result != null)
+        //                     {
+        //                         if (result.Count <= 0)
+        //                         {
+        //                             Debug.WriteLine("Entro a registrarlo porque es nuevo");
+        //                             Exports["ghmattimysql"].execute(
+        //                                 "INSERT INTO bank_users (`name`,`identifier`,`money`,`gold`) VALUES (?,?,?,?)",
+        //                                 new object[] {Banco.Name, ToIdentifier, 0.0, 0.0},
+        //                                 new Action<dynamic>((result2) =>
+        //                                 {
+        //                                     if (result2 != null)
+        //                                     {
+        //                                         Debug.WriteLine("Lo he registrado en bd");
+        //                                         done2 =  Banco.AddUserGold(ToIdentifier, Gold);
+        //                                     }
+        //                                 }));
+        //                         }
+        //                         else
+        //                         {
+        //                             done2 =  Banco.AddUserGold(ToIdentifier, Gold);
+        //                         }
+        //                     }
+        //                 }));
+        //         }
+        //         if (!done2) { Banco.AddUserGold(FromIdentifier, Gold);}
+        //     }
+        //
+        //     if (from != null)
+        //     {
+        //         from.TriggerEvent("vorp:refreshBank",Banco.BankUsers["steam:"+from.Identifiers["steam"]].Money,
+        //             Banco.BankUsers["steam:"+from.Identifiers["steam"]].Gold);
+        //     }
+        //
+        //     if (to != null)
+        //     {
+        //         to.TriggerEvent("vorp:refreshBank",Banco.BankUsers["steam:"+to.Identifiers["steam"]].Money,
+        //             Banco.BankUsers["steam:"+to.Identifiers["steam"]].Gold);
+        //     }
+        // }
     }
 }
