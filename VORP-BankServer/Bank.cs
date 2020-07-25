@@ -17,7 +17,13 @@ namespace VORP_BankServer
             get => _name;
             set => _name = value;
         }
-        
+
+        public Dictionary<string, BankUser> BankUsers
+        {
+            get => _bankUsers;
+            set => _bankUsers = value;
+        }
+
         public Bank(string name)
         {
             this._name = name;
@@ -31,85 +37,25 @@ namespace VORP_BankServer
                 if (("steam:"+player.Identifiers["steam"]) == steamId)
                 {
                     return true;
-                    Debug.WriteLine("Esta conectado");
                 }
             }
            
             return false;
         }
 
-        //PRE: identifier not null
-        //POST: return isRegistered and register it on database if not
-        private async Task<bool> IsUserRegistered(string identifier)
+        public void Transference(Player playerSend, string toSteamId, double gold, double money,bool instant,string subject)
         {
-            bool resultado = false;
-            Exports["ghmattimysql"].execute("SELECT * FROM bank_users WHERE identifier = ? AND `name` = ?",
-                new object[] {identifier,Name},
-                new Action<dynamic>((result) =>
-                {
-                    if (result != null)
-                    {
-                        if (result.Count <= 0)
-                        {
-                            Debug.WriteLine("Entro a registrarlo porque es nuevo");
-                            Exports["ghmattimysql"].execute("INSERT INTO bank_users (`name`,`identifier`,`money`,`gold`) VALUES (?,?,?,?)",
-                                new object[] {Name,identifier,0.0,0.0},
-                                new Action<dynamic>((result2) =>
-                                {
-                                    if (result2 != null)
-                                    {
-                                        Debug.WriteLine("Lo he registrado en bd");
-                                        resultado = true;
-                                    }
-                                }));
-                        }
-                        else
-                        {
-                            resultado = true;
-                        }
-                    }
-                }));
-            return resultado;
-        }
+            //TransferenceC newTransference = new TransferenceC("steam:"+playerSend.Identifiers["steam"],toSteamId,money,gold,subject,Name,Name,LoadConfig.Config["time"].ToObject<int>());
 
-        public bool Transference(string fromSteamId, string toSteamId, double gold, double money)
-        {
-            PlayerList playerList = new PlayerList();
-            Player from = null;
-            Player to = null;
-            foreach (Player player in playerList)
+            if ( instant)
             {
-                if ("steam:"+player.Identifiers["steam"] == fromSteamId) from = player;
-                if ("steam:"+player.Identifiers["steam"] == toSteamId) to = player;
+                
+                
             }
-            bool done = false;
-            if (money > 0.0)
+            else
             {
-                done = SubUserMoney(fromSteamId, money);
-                if (done) done =  AddUserMoney(toSteamId, money);
-                if (!done){  AddUserMoney(fromSteamId, money); return false;}
+                //Server.TransferenceList.Add(newTransference);
             }
-
-            if (gold > 0.0)
-            {
-                done = SubUserGold(fromSteamId, gold);
-                if (done) done =  AddUserGold(toSteamId, gold);
-                if (!done) { AddUserGold(fromSteamId, gold); return false; }
-            }
-
-            if (from != null)
-            {
-                from.TriggerEvent("vorp:refreshBank",_bankUsers["steam:"+from.Identifiers["steam"]].Money,
-                    _bankUsers["steam:"+from.Identifiers["steam"]].Gold);
-            }
-
-            if (to != null)
-            {
-                to.TriggerEvent("vorp:refreshBank",_bankUsers["steam:"+to.Identifiers["steam"]].Money,
-                    _bankUsers["steam:"+to.Identifiers["steam"]].Gold);
-            }
-            
-            return done;
         }
 
         public void Withdraw([FromSource]Player source, double money, double gold)

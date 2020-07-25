@@ -12,10 +12,14 @@ namespace VORP_BankServer
 {
     public class Server : BaseScript
     {
+        
+        public static List<TransferenceC> TransferenceList = new List<TransferenceC>();
+
         public Server()
         {
             EventHandlers["vorp:bankDeposit"] += new Action<Player,string,double,double>(Deposit);
             EventHandlers["vorp:bankWithdraw"] += new Action<Player,string,double,double>(Withdraw);
+            EventHandlers["vorp:bankTrasference"] += new Action<Player,string,double,double,bool,string,string>(Transference);
             // EventHandlers["vorp:bankAddMoney"] += new Action<Player, string, double, string>(addMoney);
             // EventHandlers["vorp:bankAddGold"] += new Action<Player, string, double, string>(addGold);
             // EventHandlers["vorp:bankSubMoney"] += new Action<Player, string, double, string>(subMoney);
@@ -25,6 +29,31 @@ namespace VORP_BankServer
             // EventHandlers["vorp:registerUserInBank"] += new Action<Player, string>(registerUserInBank);
             Delay(100);
             RegisterEvents();
+        }
+
+        private void Transference([FromSource] Player player, string toSteamId, double money, double gold,bool instantTak,string usedBank,string subject)
+        {
+            if (Database.Banks.ContainsKey(usedBank))
+            {
+                Database.Banks[usedBank].Transference(player, toSteamId, gold, money,instantTak,subject);
+            }
+        }
+
+        private async Task ExecuteTransaction()
+        {
+            await Delay(1000);
+            foreach (TransferenceC transference in TransferenceList)
+            {
+                if (transference.Time == 0)
+                {
+                    //Aqui se haria la consulta de base de datos para hacer la transferencia
+                    TransferenceList.Remove(transference);
+                }
+                else
+                {
+                    transference.RestTime();
+                }
+            }
         }
         
         

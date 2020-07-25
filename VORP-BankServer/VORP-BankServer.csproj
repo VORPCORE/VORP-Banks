@@ -55,6 +55,7 @@
     <Compile Include="LoadConfig.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TransferenceC.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Config.json">

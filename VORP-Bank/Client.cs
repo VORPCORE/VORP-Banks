@@ -42,7 +42,7 @@ namespace VORP_BankClient
                 if (API.GetDistanceBetweenCoords(util["coords"]["x"].ToObject<float>(), util["coords"]["y"].ToObject<float>(), util["coords"]["z"].ToObject<float>(), playerCoords.X,
                     playerCoords.Y, playerCoords.Z, false) <= 1.0f)
                 {
-                    await Utils.DrawTxt("Presiona Espacio para hablar con el bankero", 0.5f, 0.9f, 0.7f, 0.7f, 355, 255, 255, 255,
+                    await Utils.DrawTxt("Presiona ~e~Espacio~q~ para hablar con el bankero", 0.5f, 0.9f, 0.7f, 0.7f, 255, 255, 255, 255,
                         true, true);
                     if (API.IsControlJustPressed(2, 0xD9D0E1C0))
                     {
