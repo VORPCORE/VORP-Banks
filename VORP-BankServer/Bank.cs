@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CitizenFX.Core;
+using CitizenFX.Core.Native;
 /*PROPERTY OF KLC_BY AVILILLA*/
 namespace VORP_BankServer
 {
@@ -27,6 +28,12 @@ namespace VORP_BankServer
         public Bank(string name)
         {
             this._name = name;
+            API.RegisterCommand("Comprobar", new Action<dynamic, dynamic, dynamic>(async(x, y, z) => {
+               Task<bool> result =  CheckAndRegister("steam:11000011062b830", "BlackWater");
+                Debug.WriteLine("Lanzado");
+                await result;
+                Debug.WriteLine($"Lo tengo con valor {result.Result}");
+            }),false);
         }
 
         public static bool IsUserConnected(string steamId)
@@ -89,64 +96,57 @@ namespace VORP_BankServer
                 _bankUsers["steam:"+source.Identifiers["steam"]].Gold);
         }
 
-        public async void Deposit([FromSource]Player source, double money, double gold)
+        public async Task<bool> CheckAndRegister(string steamId,string Name)
         {
-            TriggerEvent("vorp:getCharacter", int.Parse(source.Handle), new Action<dynamic>((user) =>
+            dynamic result = await Exports["ghmattimysql"].executeSync("SELECT * FROM bank_users WHERE identifier = ? AND `name` = ?",
+                    new object[] { steamId, Name });
+            if (int.Parse(result.Count.ToString()) > 0)
+            {
+                Debug.WriteLine("Esta registrado");
+                return true;
+            }
+            else
+            {
+                dynamic result2 = await Exports["ghmattimysql"].executeSync("INSERT INTO bank_users (`name`,`identifier`,`money`,`gold`) VALUES (?,?,?,?)",
+                                      new object[] { Name, steamId, 0.0, 0.0 });
+                if (int.Parse(result2.affectedRows.ToString()) > 0)
+                {
+                    Debug.WriteLine("Lo registro");
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+
+            }
+        }
+
+        public void Deposit([FromSource]Player source, double money, double gold)
+        {
+            TriggerEvent("vorp:getCharacter", int.Parse(source.Handle), new Action<dynamic>(async(user) =>
             {
                 double newMoney = user.money - money;
                 double newGold = user.gold - gold;
                 string steamId = "steam:" + source.Identifiers["steam"];
-                Exports["ghmattimysql"].execute("SELECT * FROM bank_users WHERE identifier = ? AND `name` = ?",
-                    new object[] {steamId,Name},
-                    new Action<dynamic>((result) =>
+                Task<bool> resultadoConsulta = CheckAndRegister(steamId, Name);
+                await resultadoConsulta;
+                if (resultadoConsulta.Result)
+                {
+                    if (newMoney >= 0)
                     {
-                        if (result != null)
-                        {
-                            if (result.Count <= 0)
-                            {
-                                Debug.WriteLine("Entro a registrarlo porque es nuevo");
-                                Exports["ghmattimysql"].execute("INSERT INTO bank_users (`name`,`identifier`,`money`,`gold`) VALUES (?,?,?,?)",
-                                    new object[] {Name,steamId,0.0,0.0},
-                                    new Action<dynamic>((result2) =>
-                                    {
-                                        if (result2 != null)
-                                        {
-                                            Debug.WriteLine("Lo he registrado en bd");
-                                            if (newMoney >= 0)
-                                            {
-                                                TriggerEvent("vorp:removeMoney", int.Parse(source.Handle), 0, money);
-                                                AddUserMoney("steam:"+source.Identifiers["steam"], money);
-                                            }
-                
-                                            if (newGold >= 0)
-                                            {
-                                                TriggerEvent("vorp:removeMoney", int.Parse(source.Handle), 1, gold);
-                                                AddUserGold("steam:"+source.Identifiers["steam"], gold);
-                                            }
-                                            source.TriggerEvent("vorp:refreshBank",_bankUsers[steamId].Money,
-                                                _bankUsers[steamId].Gold);
-                                        }
-                                    }));
-                            }
-                            else
-                            {
-                                if (newMoney >= 0)
-                                {
-                                    TriggerEvent("vorp:removeMoney", int.Parse(source.Handle), 0, money);
-                                    AddUserMoney("steam:"+source.Identifiers["steam"], money);
-                                }
-                
-                                if (newGold >= 0)
-                                {
-                                    TriggerEvent("vorp:removeMoney", int.Parse(source.Handle), 1, gold);
-                                    AddUserGold("steam:"+source.Identifiers["steam"], gold);
-                                }
-                                source.TriggerEvent("vorp:refreshBank",_bankUsers[steamId].Money,
-                                    _bankUsers[steamId].Gold);
-                            }
-                        }
-                    }));
-                
+                        TriggerEvent("vorp:removeMoney", int.Parse(source.Handle), 0, money);
+                        AddUserMoney("steam:" + source.Identifiers["steam"], money);
+                    }
+
+                    if (newGold >= 0)
+                    {
+                        TriggerEvent("vorp:removeMoney", int.Parse(source.Handle), 1, gold);
+                        AddUserGold("steam:" + source.Identifiers["steam"], gold);
+                    }
+                    source.TriggerEvent("vorp:refreshBank", _bankUsers[steamId].Money,
+                        _bankUsers[steamId].Gold);
+                } 
             }));
         }
 

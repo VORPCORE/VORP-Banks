@@ -114,7 +114,5 @@ namespace VORP_BankServer
                 Database.Banks[bank].Deposit(source,money,gold);
             }
         }
-
-        
     }
 }
