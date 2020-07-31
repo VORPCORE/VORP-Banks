@@ -51,5 +51,12 @@ namespace VORP_Bank
             Function.Call(Hash.SET_TEXT_FONT_FOR_CURRENT_COMMAND, 1);
             Function.Call(Hash._DISPLAY_TEXT, str, x, y);
         }
+
+        public static DateTime UnixTimestampToDateTime(double unixTime)
+        {
+            DateTime unixStart = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+            long unixTimeStampInTicks = (long)(unixTime * TimeSpan.TicksPerSecond);
+            return new DateTime(unixStart.Ticks + unixTimeStampInTicks, System.DateTimeKind.Utc);
+        }
     }
 }

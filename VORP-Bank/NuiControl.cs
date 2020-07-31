@@ -51,6 +51,7 @@ namespace VORP_Bank
                 Debug.WriteLine(data.ToString());
                 double money = data["money"].ToObject<double>();
                 double gold = data["gold"].ToObject<double>();
+
                 TriggerServerEvent("vorp:bankDeposit",Client.UsedBank,money,gold);
                 //uno de los dos o los dos pueden tener valor si no tuvieran devuelven 0 
             }

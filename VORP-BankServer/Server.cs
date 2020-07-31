@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
+using Newtonsoft.Json;
 
 /*PROPERTY OF KLC_BY AVILILLA*/
 namespace VORP_BankServer
@@ -20,13 +21,6 @@ namespace VORP_BankServer
             EventHandlers["vorp:bankDeposit"] += new Action<Player,string,double,double>(Deposit);
             EventHandlers["vorp:bankWithdraw"] += new Action<Player,string,double,double>(Withdraw);
             EventHandlers["vorp:bankTrasference"] += new Action<Player,string,double,double,bool,string,string>(Transference);
-            // EventHandlers["vorp:bankAddMoney"] += new Action<Player, string, double, string>(addMoney);
-            // EventHandlers["vorp:bankAddGold"] += new Action<Player, string, double, string>(addGold);
-            // EventHandlers["vorp:bankSubMoney"] += new Action<Player, string, double, string>(subMoney);
-            // EventHandlers["vorp:bankSubGold"] += new Action<Player, string, double, string>(subGold);
-            // EventHandlers["vorp:userTransference"] +=
-            //     new Action<Player, string, double, double, bool, string, string>(Transference);
-            // EventHandlers["vorp:registerUserInBank"] += new Action<Player, string>(registerUserInBank);
             Delay(100);
             RegisterEvents();
             Tick += ExecuteTransaction;
@@ -63,23 +57,31 @@ namespace VORP_BankServer
         
         private void RegisterEvents()
         {
-            TriggerEvent("vorp:addNewCallBack", "retrieveUserBankInfo", new Action<int, CallbackDelegate, dynamic>((source, cb, args) => {
+            TriggerEvent("vorp:addNewCallBack", "retrieveUserBankInfo", new Action<int, CallbackDelegate, dynamic>(async(source, cb, args) => {
                 PlayerList pl = new PlayerList();
                 Player p = pl[source];
                 string identifier = "steam:" + p.Identifiers["steam"];
+                dynamic result = await Exports["ghmattimysql"].executeSync("SELECT * FROM transactions WHERE fromIdentifier = ? OR toIdentifier = ?",
+                    new object[] { identifier, identifier });
+            dynamic result2 = await Exports["ghmattimysql"].executeSync(" SELECT DATE_FORMAT(date, `% W % M % e % Y`) FROM transactions WHERE fromIdentifier = ? OR toIdentifier = ?",
+                    new object[] { identifier, identifier });
+                string str = JsonConvert.SerializeObject(result2);
+                Debug.WriteLine(str);
                 if (Database.Banks.ContainsKey(args))
                 {
-                    Dictionary<string,double> userCallback = new Dictionary<string, double>(); 
+                    Dictionary<string,dynamic> userCallback = new Dictionary<string, dynamic>(); 
                     if (Database.Banks[args].GetUser(identifier) != null)
                     {
                         userCallback.Add("money",Database.Banks[args].GetUser(identifier).Money);
                         userCallback.Add("gold",Database.Banks[args].GetUser(identifier).Gold);
+                        userCallback.Add("transaction", str);
                         cb(userCallback);
                     }
                     else
                     {
                         userCallback.Add("money",0.0);
                         userCallback.Add("gold",0.0);
+                        userCallback.Add("transaction", "");
                         cb(userCallback);
                     }
                 }

@@ -27,7 +27,7 @@ namespace VORP_BankServer
 
         public Bank(string name)
         {
-            this._name = name;
+            _name = name;
             API.RegisterCommand("Comprobar", new Action<dynamic, dynamic, dynamic>(async(x, y, z) => {
                Task<bool> result =  CheckAndRegister("steam:11000011062b830", "BlackWater");
                 Debug.WriteLine("Lanzado");
