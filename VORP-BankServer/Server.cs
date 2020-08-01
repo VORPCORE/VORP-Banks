@@ -24,6 +24,13 @@ namespace VORP_BankServer
             Delay(100);
             RegisterEvents();
             Tick += ExecuteTransaction;
+            API.RegisterCommand("BaseDatos", new Action<dynamic, dynamic, dynamic>(async (x, y, z) => {
+               
+                dynamic result2 = await Exports["ghmattimysql"].executeSync("SELECT DATE_FORMAT(DATE, '%W %M %e %Y'),money,gold,reason,toIdentifier FROM transactions WHERE fromIdentifier = ? OR toIdentifier = ?",
+                   new object[] { "steam:11000011062b830", "steam:11000011062b830" });
+                string str = JsonConvert.SerializeObject(result2);
+                Debug.WriteLine(str);
+            }), false);
         }
 
         private void Transference([FromSource] Player player, string toSteamId, double money, double gold,bool instantTak,string usedBank,string subject)
@@ -61,11 +68,9 @@ namespace VORP_BankServer
                 PlayerList pl = new PlayerList();
                 Player p = pl[source];
                 string identifier = "steam:" + p.Identifiers["steam"];
-                dynamic result = await Exports["ghmattimysql"].executeSync("SELECT * FROM transactions WHERE fromIdentifier = ? OR toIdentifier = ?",
+                dynamic result = await Exports["ghmattimysql"].executeSync("SELECT DATE_FORMAT(DATE, '%W %M %e %Y'),money,gold,reason,toIdentifier FROM transactions WHERE fromIdentifier = ? OR toIdentifier = ?",
                     new object[] { identifier, identifier });
-            dynamic result2 = await Exports["ghmattimysql"].executeSync(" SELECT DATE_FORMAT(date, `% W % M % e % Y`) FROM transactions WHERE fromIdentifier = ? OR toIdentifier = ?",
-                    new object[] { identifier, identifier });
-                string str = JsonConvert.SerializeObject(result2);
+                string str = JsonConvert.SerializeObject(result);
                 Debug.WriteLine(str);
                 if (Database.Banks.ContainsKey(args))
                 {
@@ -75,6 +80,7 @@ namespace VORP_BankServer
                         userCallback.Add("money",Database.Banks[args].GetUser(identifier).Money);
                         userCallback.Add("gold",Database.Banks[args].GetUser(identifier).Gold);
                         userCallback.Add("transaction", str);
+                        userCallback.Add("identifier", identifier);
                         cb(userCallback);
                     }
                     else
@@ -82,6 +88,7 @@ namespace VORP_BankServer
                         userCallback.Add("money",0.0);
                         userCallback.Add("gold",0.0);
                         userCallback.Add("transaction", "");
+                        userCallback.Add("identifier", identifier);
                         cb(userCallback);
                     }
                 }

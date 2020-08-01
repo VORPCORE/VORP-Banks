@@ -66,11 +66,18 @@ namespace VORP_BankClient
                 foreach (var transaction in transactions)
                 {
                     JObject obj = new JObject();
-                    obj.Add("date", transaction["date"]);
+                    obj.Add("date", transaction["DATE_FORMAT(DATE, '%W %M %e %Y')"]);
                     obj.Add("money", transaction["money"]);
                     obj.Add("gold", transaction["gold"]);
                     obj.Add("msg", transaction["reason"]);
-                    obj.Add("operation", transaction["toIdentifier"]);
+                    if(transaction["toIdentifier"].ToString() == args.identifier.ToString())
+                    {
+                        obj.Add("operation", "Received");
+                    }
+                    else
+                    {
+                        obj.Add("operation", "Sended");
+                    }
                     trans.Add(obj);
                 }
                 data2.Add("action", "showTransfers");
