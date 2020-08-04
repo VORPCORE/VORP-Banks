@@ -77,6 +77,8 @@ namespace VORP_BankServer
                     Dictionary<string,dynamic> userCallback = new Dictionary<string, dynamic>(); 
                     if (Database.Banks[args].GetUser(identifier) != null)
                     {
+                        Debug.WriteLine(Database.Banks[args].GetUser(identifier).Money.ToString());
+                        Debug.WriteLine(Database.Banks[args].GetUser(identifier).Gold.ToString());
                         userCallback.Add("money",Database.Banks[args].GetUser(identifier).Money);
                         userCallback.Add("gold",Database.Banks[args].GetUser(identifier).Gold);
                         userCallback.Add("transaction", str);
@@ -87,7 +89,7 @@ namespace VORP_BankServer
                     {
                         userCallback.Add("money",0.0);
                         userCallback.Add("gold",0.0);
-                        userCallback.Add("transaction", "");
+                        userCallback.Add("transaction", str);
                         userCallback.Add("identifier", identifier);
                         cb(userCallback);
                     }

@@ -16,10 +16,12 @@ namespace VORP_BankClient
     {
         private bool InBank = false;
         public static string UsedBank;
+
         public  Client()
         {
             EventHandlers["onClientResourceStart"] += new Action<string>(OnClientResourceStart);
             Tick += OnBank;
+            
         }
 
         private async void OnClientResourceStart(string resourceName)
@@ -61,31 +63,36 @@ namespace VORP_BankClient
                 Debug.WriteLine(bank);
                 JObject data = new JObject();
                 JObject data2 = new JObject();
-                JArray trans = new JArray();
-                JArray transactions = JArray.Parse(args.transaction.ToString());
-                foreach (var transaction in transactions)
-                {
-                    JObject obj = new JObject();
-                    obj.Add("date", transaction["DATE_FORMAT(DATE, '%W %M %e %Y')"]);
-                    obj.Add("money", transaction["money"]);
-                    obj.Add("gold", transaction["gold"]);
-                    obj.Add("msg", transaction["reason"]);
-                    if(transaction["toIdentifier"].ToString() == args.identifier.ToString())
+                if(args.transaction.ToString() != "[]") {
+                    JArray trans = new JArray();
+                    JArray transactions = JArray.Parse(args.transaction.ToString());
+                    foreach (var transaction in transactions)
                     {
-                        obj.Add("operation", "Received");
+                        JObject obj = new JObject();
+                        obj.Add("date", transaction["DATE_FORMAT(DATE, '%W %M %e %Y')"]);
+                        obj.Add("money", transaction["money"]);
+                        obj.Add("gold", transaction["gold"]);
+                        obj.Add("msg", transaction["reason"]);
+                        if (transaction["toIdentifier"].ToString() == args.identifier.ToString())
+                        {
+                            obj.Add("operation", "Received");
+                        }
+                        else
+                        {
+                            obj.Add("operation", "Sended");
+                        }
+                        trans.Add(obj);
                     }
-                    else
-                    {
-                        obj.Add("operation", "Sended");
-                    }
-                    trans.Add(obj);
+                    data2.Add("action", "showTransfers");
+                    data2.Add("transfers", trans);
+
+                    API.SendNuiMessage(data2.ToString());
                 }
-                data2.Add("action", "showTransfers");
-                data2.Add("transfers", trans);
-                API.SendNuiMessage(data2.ToString());
                 data.Add("action", "showAccount");
                 data.Add("bank",hudname); //Normalmente cuando hagas el archivo de traduccion recuerda poner los nobmres de los bancos rollo Saint Denis Bank
                 data.Add("money",double.Parse(args.money.ToString()));
+                Debug.WriteLine($"Money: {args.money}");
+                Debug.WriteLine($"Gold: {args.gold}");
                 data.Add("gold", double.Parse(args.gold.ToString()));
                 Debug.WriteLine(args.transaction.ToString());
                 API.SendNuiMessage(data.ToString());
