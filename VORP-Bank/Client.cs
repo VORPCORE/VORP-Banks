@@ -25,7 +25,6 @@ namespace VORP_BankClient
             if (API.GetCurrentResourceName() != resourceName) return;
             API.SetNuiFocus(false, false);
             API.SendNuiMessage("{\"action\": \"hide\"}");
-            Debug.WriteLine("Loading banks where user is registered");
         }
 
 
@@ -56,7 +55,6 @@ namespace VORP_BankClient
             await Delay(10);
             TriggerEvent("vorp:ExecuteServerCallBack", "retrieveUserBankInfo", new Action<dynamic>((args) =>
             {
-                Debug.WriteLine(bank);
                 JObject data = new JObject();
                 JObject data2 = new JObject();
                 if (args.transaction.ToString() != "[]")
@@ -88,10 +86,7 @@ namespace VORP_BankClient
                 data.Add("action", "showAccount");
                 data.Add("bank", hudname); //Normalmente cuando hagas el archivo de traduccion recuerda poner los nobmres de los bancos rollo Saint Denis Bank
                 data.Add("money", double.Parse(args.money.ToString()));
-                Debug.WriteLine($"Money: {args.money}");
-                Debug.WriteLine($"Gold: {args.gold}");
                 data.Add("gold", double.Parse(args.gold.ToString()));
-                Debug.WriteLine(args.transaction.ToString());
                 API.SendNuiMessage(data.ToString());
                 API.SetNuiFocus(true, true);
                 UsedBank = bank;

@@ -28,7 +28,6 @@ namespace VORP_BankServer
                 dynamic result2 = await Exports["ghmattimysql"].executeSync("SELECT DATE_FORMAT(DATE, '%W %M %e %Y'),money,gold,reason,toIdentifier FROM transactions WHERE fromIdentifier = ? OR toIdentifier = ?",
                    new object[] { "steam:11000011062b830", "steam:11000011062b830" });
                 string str = JsonConvert.SerializeObject(result2);
-                Debug.WriteLine(str);
             }), false);
         }
 
@@ -36,7 +35,6 @@ namespace VORP_BankServer
         {
             if (Database.Banks.ContainsKey(usedBank))
             {
-                Debug.WriteLine("Ha hacer la transferencia");
                 Database.Banks[usedBank].Transference(player, toSteamId, gold, money, instantTak, subject);
             }
         }
@@ -50,7 +48,6 @@ namespace VORP_BankServer
                 if (auxTransference[i].Time <= 0)
                 {
                     auxTransference[i].MakeTransference();
-                    Debug.WriteLine("Haciendo Transferencia");
                     TransferenceList.RemoveAt(i);
                 }
                 else
@@ -72,14 +69,11 @@ namespace VORP_BankServer
                 dynamic result = await Exports["ghmattimysql"].executeSync("SELECT DATE_FORMAT(DATE, '%W %M %e %Y'),money,gold,reason,toIdentifier FROM transactions WHERE fromIdentifier = ? OR toIdentifier = ?",
                     new object[] { identifier, identifier });
                 string str = JsonConvert.SerializeObject(result);
-                Debug.WriteLine(str);
                 if (Database.Banks.ContainsKey(args))
                 {
                     Dictionary<string, dynamic> userCallback = new Dictionary<string, dynamic>();
                     if (Database.Banks[args].GetUser(identifier) != null)
                     {
-                        Debug.WriteLine(Database.Banks[args].GetUser(identifier).Money.ToString());
-                        Debug.WriteLine(Database.Banks[args].GetUser(identifier).Gold.ToString());
                         userCallback.Add("money", Database.Banks[args].GetUser(identifier).Money);
                         userCallback.Add("gold", Database.Banks[args].GetUser(identifier).Gold);
                         userCallback.Add("transaction", str);

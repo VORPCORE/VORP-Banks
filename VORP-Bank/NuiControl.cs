@@ -31,7 +31,6 @@ namespace VORP_Bank
 
         private void RefreshBank(double money, double gold)
         {
-            Debug.WriteLine("Me actualizo");
             JObject data = new JObject();
             data.Add("action", "updateNumbers");
             data.Add("money", money);
@@ -44,7 +43,6 @@ namespace VORP_Bank
             if (obj != null)
             {
                 JObject data = JObject.FromObject(obj);
-                Debug.WriteLine(data.ToString());
                 double money = data["money"].ToObject<double>();
                 double gold = data["gold"].ToObject<double>();
 
@@ -58,7 +56,6 @@ namespace VORP_Bank
             if (obj != null)
             {
                 JObject data = JObject.FromObject(obj);
-                Debug.WriteLine(data.ToString());
                 double money = data["money"].ToObject<double>();
                 double gold = data["gold"].ToObject<double>();
                 TriggerServerEvent("vorp:bankWithdraw", Client.UsedBank, money, gold);
@@ -71,9 +68,7 @@ namespace VORP_Bank
             if (obj != null)
             {
                 JObject data = JObject.FromObject(obj);
-                Debug.WriteLine(data.ToString());
                 string name = data["name"].ToString();
-                Debug.WriteLine(name);
                 JObject sendData = new JObject();
                 TriggerEvent("vorp:ExecuteServerCallBack", "searchUsers", new Action<dynamic>((args) =>
                 {
@@ -88,7 +83,6 @@ namespace VORP_Bank
                         userList.Add(useraux);
                     }
                     sendData.Add("userList", userList);
-                    Debug.WriteLine(sendData.ToString());
                     API.SendNuiMessage(sendData.ToString());
                 }), name);
             }
@@ -96,12 +90,9 @@ namespace VORP_Bank
 
         private void SendTransfer(ExpandoObject obj)
         {
-            Debug.WriteLine("Hola");
             if (obj != null)
             {
-                Debug.WriteLine("Entro");
                 JObject data = JObject.FromObject(obj);
-                Debug.WriteLine(data.ToString());
                 string steamId = data["steam"].ToString();
                 double money = double.Parse(data["money"].ToString());
                 double gold = double.Parse(data["gold"].ToString());

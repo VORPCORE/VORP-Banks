@@ -91,7 +91,6 @@ namespace VORP_BankServer
 
         public void MakeTransference()
         {
-            Debug.WriteLine("Iniciando transferencia");
             Exports["ghmattimysql"].execute("SELECT * FROM bank_users WHERE identifier = ? AND `name` = ?",
             new object[] { ToIdentifier, Banco.Name },
             new Action<dynamic>((result) =>
@@ -100,7 +99,6 @@ namespace VORP_BankServer
                 {
                     if (result.Count <= 0)
                     {
-                        Debug.WriteLine("Entro a registrarlo porque es nuevo");
 
                         Exports["ghmattimysql"].execute(
                             "INSERT INTO bank_users (`name`,`identifier`,`money`,`gold`) VALUES (?,?,?,?)",
@@ -132,7 +130,6 @@ namespace VORP_BankServer
                     }
                 }
             }));
-            Debug.WriteLine("Terminando transferencia");
         }
     }
 }

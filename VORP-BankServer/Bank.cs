@@ -29,9 +29,7 @@ namespace VORP_BankServer
             API.RegisterCommand("Comprobar", new Action<dynamic, dynamic, dynamic>(async (x, y, z) =>
             {
                 Task<bool> result = CheckAndRegister("steam:11000011062b830", "BlackWater");
-                Debug.WriteLine("Lanzado");
                 await result;
-                Debug.WriteLine($"Lo tengo con valor {result.Result}");
             }), false);
         }
 
@@ -101,7 +99,6 @@ namespace VORP_BankServer
                     new object[] { steamId, Name });
             if (int.Parse(result.Count.ToString()) > 0)
             {
-                Debug.WriteLine("Esta registrado");
                 return true;
             }
             else
@@ -110,7 +107,6 @@ namespace VORP_BankServer
                                       new object[] { Name, steamId, 0.0, 0.0 });
                 if (int.Parse(result2.affectedRows.ToString()) > 0)
                 {
-                    Debug.WriteLine("Lo registro");
                     return true;
                 }
                 else
@@ -193,10 +189,8 @@ namespace VORP_BankServer
                 $"UPDATE bank_users SET money = money + ? WHERE identifier=? and name = ?",
                 new object[] { money, steamId, _name }
             );
-            Debug.WriteLine("entro en dinero");
             if (IsUserConnected(steamId))
             {
-                Debug.WriteLine("Usuario conectado");
                 BankUser newUser = new BankUser(Name, steamId, money, 0.0);
                 _bankUsers.Add(steamId, newUser);
                 return true;
@@ -225,11 +219,9 @@ namespace VORP_BankServer
                 $"UPDATE bank_users SET gold = gold + ? WHERE identifier=? and name = ?",
                 new object[] { gold, steamId, _name }
             );
-            Debug.WriteLine("entro en oro");
 
             if (IsUserConnected(steamId))
             {
-                Debug.WriteLine("Usuario conectado");
                 BankUser newUser = new BankUser(Name, steamId, 0.0, gold);
                 _bankUsers.Add(steamId, newUser);
             }

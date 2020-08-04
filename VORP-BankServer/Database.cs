@@ -24,13 +24,11 @@ namespace VORP_BankServer
             await Delay(2000);
             Exports["ghmattimysql"].execute("SELECT * FROM banks", new Action<dynamic>((result) =>
             {
-                Debug.WriteLine(result.Count.ToString());
                 if (result != null)
                 {
                     foreach (var bank in result)
                     {
                         Banks.Add(bank.name.ToString(), new Bank(bank.name.ToString()));
-                        Debug.WriteLine($"Added :{bank.name} with {bank.money} money and {bank.gold} gold");
                     }
                 }
                 PlayerList playerList = new PlayerList();
