@@ -35,7 +35,14 @@ namespace VORP_BankServer
         {
             if (Database.Banks.ContainsKey(usedBank))
             {
-                Database.Banks[usedBank].Transference(player, toSteamId, gold, money, instantTak, subject);
+                bool TransferenceResult = Database.Banks[usedBank].Transference(player, toSteamId, gold, money, instantTak, subject);
+                if (!TransferenceResult && instantTak)
+                {
+                    player.TriggerEvent("vorp:Tip", LoadConfig.Langs["InsuficientMoneyInstatnTrasference"], 2000);
+                }
+                else if (!TransferenceResult) {
+                    player.TriggerEvent("vorp:Tip", LoadConfig.Langs["InsuficientMoneyTrasference"], 2000);
+                }
             }
         }
 

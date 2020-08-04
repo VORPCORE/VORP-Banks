@@ -47,9 +47,10 @@ namespace VORP_BankServer
             return false;
         }
 
-        public void Transference(Player playerSend, string toSteamId, double gold, double money, bool instant, string subject)
+        public bool Transference(Player playerSend, string toSteamId, double gold, double money, bool instant, string subject)
         {
             string steam = "steam:" + playerSend.Identifiers["steam"];
+            bool done = false;
             double auxmoney = money;
             if (instant) auxmoney = money + LoadConfig.Config["transferenceCost"].ToObject<double>();
             if (_bankUsers[steam].SubMoney(auxmoney) && _bankUsers[steam].SubGold(gold))
@@ -60,14 +61,17 @@ namespace VORP_BankServer
                     newTransference.MakeTransference();
                     playerSend.TriggerEvent("vorp:refreshBank", _bankUsers[steam].Money,
                         _bankUsers[steam].Gold);
+                    return true;
                 }
                 else
                 {
                     if (IsUserConnected(steam)) playerSend.TriggerEvent("vorp:refreshBank", _bankUsers[steam].Money,
                          _bankUsers[steam].Gold);
                     Server.TransferenceList.Add(newTransference);
+                    return true;
                 }
             }
+            return false; 
         }
 
         public void Withdraw([FromSource] Player source, double money, double gold)
