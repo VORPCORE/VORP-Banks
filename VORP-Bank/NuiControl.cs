@@ -1,22 +1,18 @@
 ﻿using CitizenFX.Core;
 using CitizenFX.Core.Native;
-using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Dynamic;
 using VORP_BankClient;
 
 /*PROPERTY OF KLC_BY AVILILLA*/
 namespace VORP_Bank
 {
-    class NuiControl:BaseScript
+    class NuiControl : BaseScript
     {
         public NuiControl()
         {
-            EventHandlers["vorp:refreshBank"] += new Action<double,double>(RefreshBank);
+            EventHandlers["vorp:refreshBank"] += new Action<double, double>(RefreshBank);
             API.RegisterNuiCallbackType("Deposit");
             EventHandlers["__cfx_nui:Deposit"] += new Action<ExpandoObject>(Deposit);
 
@@ -37,22 +33,22 @@ namespace VORP_Bank
         {
             Debug.WriteLine("Me actualizo");
             JObject data = new JObject();
-            data.Add("action","updateNumbers");
-            data.Add("money",money);
-            data.Add("gold",gold);
+            data.Add("action", "updateNumbers");
+            data.Add("money", money);
+            data.Add("gold", gold);
             API.SendNuiMessage(data.ToString());
         }
 
         private void Deposit(ExpandoObject obj)
         {
-            if(obj != null)
+            if (obj != null)
             {
                 JObject data = JObject.FromObject(obj);
                 Debug.WriteLine(data.ToString());
                 double money = data["money"].ToObject<double>();
                 double gold = data["gold"].ToObject<double>();
 
-                TriggerServerEvent("vorp:bankDeposit",Client.UsedBank,money,gold);
+                TriggerServerEvent("vorp:bankDeposit", Client.UsedBank, money, gold);
                 //uno de los dos o los dos pueden tener valor si no tuvieran devuelven 0 
             }
         }
@@ -65,7 +61,7 @@ namespace VORP_Bank
                 Debug.WriteLine(data.ToString());
                 double money = data["money"].ToObject<double>();
                 double gold = data["gold"].ToObject<double>();
-                TriggerServerEvent("vorp:bankWithdraw",Client.UsedBank,money,gold);
+                TriggerServerEvent("vorp:bankWithdraw", Client.UsedBank, money, gold);
                 //uno de los dos o los dos pueden tener valor si no tuvieran devuelven 0 
             }
         }
@@ -83,7 +79,7 @@ namespace VORP_Bank
                 {
                     sendData.Add("action", "showUsers");
                     JArray userList = new JArray();
-                    foreach(var user in args)
+                    foreach (var user in args)
                     {
                         JObject useraux = new JObject();
                         string resultname = user.firstname + " " + user.lastname;
@@ -94,7 +90,7 @@ namespace VORP_Bank
                     sendData.Add("userList", userList);
                     Debug.WriteLine(sendData.ToString());
                     API.SendNuiMessage(sendData.ToString());
-                }),name);
+                }), name);
             }
         }
 
@@ -111,7 +107,7 @@ namespace VORP_Bank
                 double gold = double.Parse(data["gold"].ToString());
                 bool useInstantTax = data["instant"].ToObject<bool>();
                 string subject = data["subject"].ToString();
-                TriggerServerEvent("vorp:bankTrasference", steamId, money, gold, useInstantTax,Client.UsedBank,subject);
+                TriggerServerEvent("vorp:bankTrasference", steamId, money, gold, useInstantTax, Client.UsedBank, subject);
             }
         }
 

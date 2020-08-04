@@ -1,9 +1,9 @@
-﻿using System;
-using CitizenFX.Core;
+﻿using CitizenFX.Core;
+using System;
 
 namespace VORP_BankServer
 {
-    public class TransferenceC:BaseScript
+    public class TransferenceC : BaseScript
     {
         private string _fromIdentifier;
         private string _toIdentifier;
@@ -68,10 +68,10 @@ namespace VORP_BankServer
             get => _toIdentifier;
             set => _toIdentifier = value;
         }
-        
+
 
         public TransferenceC(string fromIdentifier, string toIdentifier, double money, double gold,
-            string subject, string bankto, string bank, int time,Bank banco)
+            string subject, string bankto, string bank, int time, Bank banco)
         {
             FromIdentifier = fromIdentifier;
             ToIdentifier = toIdentifier;
@@ -91,8 +91,9 @@ namespace VORP_BankServer
 
         public void MakeTransference()
         {
+            Debug.WriteLine("Iniciando transferencia");
             Exports["ghmattimysql"].execute("SELECT * FROM bank_users WHERE identifier = ? AND `name` = ?",
-            new object[] {ToIdentifier, Banco.Name},
+            new object[] { ToIdentifier, Banco.Name },
             new Action<dynamic>((result) =>
             {
                 if (result != null)
@@ -100,15 +101,15 @@ namespace VORP_BankServer
                     if (result.Count <= 0)
                     {
                         Debug.WriteLine("Entro a registrarlo porque es nuevo");
-                        
+
                         Exports["ghmattimysql"].execute(
                             "INSERT INTO bank_users (`name`,`identifier`,`money`,`gold`) VALUES (?,?,?,?)",
-                            new object[] {Bank, ToIdentifier, Money, Gold},
+                            new object[] { Bank, ToIdentifier, Money, Gold },
                             new Action<dynamic>((result2) =>
                             {
                                 Exports["ghmattimysql"].execute(
                                     "INSERT INTO transactions (`bank`,`fromIdentifier`,`toIdentifier`,`money`,`gold`,`date`,`reason`,`bankto`) VALUES (?,?,?,?,?,CURDATE(),?,?)",
-                                    new object[] {Bank, FromIdentifier,ToIdentifier, Money, Gold,Subject,BankTo},
+                                    new object[] { Bank, FromIdentifier, ToIdentifier, Money, Gold, Subject, BankTo },
                                     new Action<dynamic>((result4) =>
                                     {
                                     }));
@@ -118,19 +119,20 @@ namespace VORP_BankServer
                     {
                         Exports["ghmattimysql"].execute(
                             "UPDATE bank_users SET money = money+? , gold = gold+?  WHERE `identifier` = ? AND `name` = ?",
-                            new object[] {Money,Gold,ToIdentifier, Banco.Name}, new Action<dynamic>((result3) =>
-                            {
-                                
-                            }));
+                            new object[] { Money, Gold, ToIdentifier, Banco.Name }, new Action<dynamic>((result3) =>
+                                {
+
+                                }));
                         Exports["ghmattimysql"].execute(
                             "INSERT INTO transactions (`bank`,`fromIdentifier`,`toIdentifier`,`money`,`gold`,`date`,`reason`,`bankto`) VALUES (?,?,?,?,?,CURDATE(),?,?)",
-                            new object[] {Bank, FromIdentifier,ToIdentifier, Money, Gold,Subject,BankTo},
+                            new object[] { Bank, FromIdentifier, ToIdentifier, Money, Gold, Subject, BankTo },
                             new Action<dynamic>((result2) =>
                             {
                             }));
                     }
                 }
             }));
+            Debug.WriteLine("Terminando transferencia");
         }
     }
 }

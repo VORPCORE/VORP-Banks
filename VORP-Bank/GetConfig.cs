@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using CitizenFX.Core;
+﻿using CitizenFX.Core;
 using CitizenFX.Core.Native;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Dynamic;
 /*PROPERTY OF KLC_BY AVILILLA*/
 namespace VORP_Bank
 {
@@ -24,7 +24,7 @@ namespace VORP_Bank
         {
             Config = JObject.Parse(dc);
 
-            foreach (KeyValuePair<string,object> l in dl)
+            foreach (KeyValuePair<string, object> l in dl)
             {
                 Langs[l.Key] = l.Value.ToString();
             }

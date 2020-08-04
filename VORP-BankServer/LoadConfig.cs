@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using CitizenFX.Core;
+﻿using CitizenFX.Core;
 using CitizenFX.Core.Native;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
 
 /*PROPERTY OF KLC_BY AVILILLA*/
 namespace VORP_BankServer
@@ -56,7 +56,7 @@ namespace VORP_BankServer
             isConfigLoaded = true;
         }
 
-        private async void getConfig([FromSource]Player source)
+        private async void getConfig([FromSource] Player source)
         {
             source.TriggerEvent($"{API.GetCurrentResourceName()}:SendConfig", ConfigString, Langs);
         }

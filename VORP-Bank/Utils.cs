@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CitizenFX.Core;
+﻿using CitizenFX.Core;
 using CitizenFX.Core.Native;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 /*PROPERTY OF KLC_BY AVILILLA*/
 namespace VORP_Bank
 {
-    public class Utils:BaseScript
+    public class Utils : BaseScript
     {
         public static List<int> Blips = new List<int>();
 
@@ -33,14 +31,14 @@ namespace VORP_Bank
         {
             foreach (JToken bank in banks)
             {
-                int blip = Function.Call<int>((Hash)0x554D9D53F696D002, 1664425300, 
+                int blip = Function.Call<int>((Hash)0x554D9D53F696D002, 1664425300,
                     bank["coords"]["x"].ToObject<float>(), bank["coords"]["y"].ToObject<float>(), bank["coords"]["z"].ToObject<float>());
                 Function.Call((Hash)0x74F74D3207ED525C, blip, bank["blipHash"].ToObject<int>(), 1);
                 Function.Call((Hash)0x9CB1A1623062F402, blip, bank["blipName"].ToString());
                 Blips.Add(blip);
             }
         }
-    
+
         public static async Task DrawTxt(string text, float x, float y, float fontscale, float fontsize, int r, int g, int b, int alpha, bool textcentred, bool shadow)
         {
             long str = Function.Call<long>(Hash._CREATE_VAR_STRING, 10, "LITERAL_STRING", text);
