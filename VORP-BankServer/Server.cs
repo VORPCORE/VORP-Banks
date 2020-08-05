@@ -24,7 +24,6 @@ namespace VORP_BankServer
             Tick += ExecuteTransaction;
             API.RegisterCommand("BaseDatos", new Action<dynamic, dynamic, dynamic>(async (x, y, z) =>
             {
-
                 dynamic result2 = await Exports["ghmattimysql"].executeSync("SELECT DATE_FORMAT(DATE, '%W %M %e %Y'),money,gold,reason,toIdentifier FROM transactions WHERE fromIdentifier = ? OR toIdentifier = ?",
                    new object[] { "steam:11000011062b830", "steam:11000011062b830" });
                 string str = JsonConvert.SerializeObject(result2);

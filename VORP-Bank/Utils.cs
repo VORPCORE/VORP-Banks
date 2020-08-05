@@ -10,6 +10,7 @@ namespace VORP_Bank
     public class Utils : BaseScript
     {
         public static List<int> Blips = new List<int>();
+        public static List<int> Peds = new List<int>();
 
         public Utils()
         {
@@ -36,6 +37,25 @@ namespace VORP_Bank
                 Function.Call((Hash)0x74F74D3207ED525C, blip, bank["blipHash"].ToObject<int>(), 1);
                 Function.Call((Hash)0x9CB1A1623062F402, blip, bank["blipName"].ToString());
                 Blips.Add(blip);
+            }
+        }
+
+        public static async void CreatePeds(JToken banks)
+        {
+            foreach(JToken bank in banks)
+            {
+                uint HashPed = (uint)API.GetHashKey(bank["NPCModel"].ToString());
+                int _PedBank = API.CreatePed(HashPed, bank["npcCoords"]["x"].ToObject<float>(), bank["npcCoords"]["y"].ToObject<float>(),
+                    bank["npcCoords"]["z"].ToObject<float>(), bank["npcCoords"]["h"].ToObject<float>(), false, true, true, true);
+                Function.Call((Hash)0x283978A15512B2FE, _PedBank, true);
+                Peds.Add(_PedBank);
+                API.SetEntityNoCollisionEntity(API.PlayerPedId(), _PedBank, false);
+                API.SetEntityCanBeDamaged(_PedBank, false);
+                API.SetEntityInvincible(_PedBank, true);
+                await Delay(2000);
+                API.FreezeEntityPosition(_PedBank, true);
+                API.SetBlockingOfNonTemporaryEvents(_PedBank, true);
+                API.SetModelAsNoLongerNeeded(HashPed);
             }
         }
 

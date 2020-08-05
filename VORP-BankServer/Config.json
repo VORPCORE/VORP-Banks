@@ -5,19 +5,40 @@
   "Banks": [
     {
       "name": "SaintDenis", //Dont touch
-      "hudName":"SAINT DENIS",
+      "hudName": "SAINT DENIS",
       "blipName": "Saint Denis Bank",
       "blipHash": -2128054417,
-      "coords": {"x": -341.07,"y": 767.35 ,"z": 116.71},
-      "npcCoords":{"x": -341.07,"y": 767.35 ,"z": 116.71}
+      "coords": {
+        "x": -341.07,
+        "y": 767.35,
+        "z": 116.71
+      },
+      "npcCoords": {
+        "x": -341.07,
+        "y": 767.35,
+        "z": 116.71,
+        "h": 0.0 //NPC Heading
+      },
+      "NPCModel": "" //NPC model that you want in this bank
     },
     {
       "name": "BlackWater", //Dont touch
-      "hudName":"BLACK WATER",
+      "hudName": "BLACK WATER",
       "blipName": "Black Water Bank",
       "blipHash": -2128054417,
-      "coords": {"x": -322.12,"y": 804.0 ,"z": 117.88},
-      "npcCoords":{"x": -322.12,"y": 804.0 ,"z": 117.88}
+      "coords": {
+        "x": -322.12,
+        "y": 804.0,
+        "z": 117.88
+      },
+
+      "npcCoords": {
+        "x": -322.12,
+        "y": 804.0,
+        "z": 117.88,
+        "h": 0.0 //NPC Heading
+      },
+      "NPCModel": "" //NPC model that you want in this bank
     }
   ]
 }
