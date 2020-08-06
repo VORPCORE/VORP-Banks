@@ -1,7 +1,8 @@
 ﻿using CitizenFX.Core;
 using System;
 using System.Collections.Generic;
-
+using System.Threading.Tasks;
+using static CitizenFX.Core.BaseScript;
 /*PROPERTY OF KLC_BY AVILILLA*/
 namespace VORP_BankServer
 {
@@ -15,11 +16,10 @@ namespace VORP_BankServer
         {
             EventHandlers["playerConnecting"] += new Action<Player, string, dynamic, dynamic>(OnPlayerConnecting);
             EventHandlers["playerDropped"] += new Action<Player, string>(OnPlayerDropped);
+            EventHandlers["banks_LoadDatabase"] += new Action(LoadDatabase);
             //Create each bank
-            LoadDatabase();
         }
-
-        private async void LoadDatabase()
+        public async void LoadDatabase()
         {
             await Delay(2000);
             Exports["ghmattimysql"].execute("SELECT * FROM banks", new Action<dynamic>((result) =>
@@ -30,11 +30,11 @@ namespace VORP_BankServer
                     {
                         Banks.Add(bank.name.ToString(), new Bank(bank.name.ToString()));
                     }
-                }
-                PlayerList playerList = new PlayerList();
-                foreach (Player player in playerList)
-                {
-                    LoadPlayer(player);
+                    PlayerList playerList = new PlayerList();
+                    foreach (Player player in playerList)
+                    {
+                        LoadPlayer(player);
+                    }
                 }
             }));
         }
