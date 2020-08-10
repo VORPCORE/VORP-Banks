@@ -22,14 +22,18 @@ ENGINE=InnoDB
 ;
 
 CREATE TABLE `transactions` (
-	`bank` VARCHAR(50) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
-	`fromIdentifier` VARCHAR(50) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
-	`toIdentifier` VARCHAR(50) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
-	`quantity` DOUBLE(22,0) NULL DEFAULT NULL,
-	`date` DATE NULL DEFAULT NULL,
-	`reason` VARCHAR(100) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
-	INDEX `FK_transactions_banks` (`bank`) USING BTREE,
-	CONSTRAINT `FK_transactions_banks` FOREIGN KEY (`bank`) REFERENCES `vorp`.`banks` (`name`) ON UPDATE CASCADE ON DELETE CASCADE
+	`bank` varchar(50) DEFAULT NULL,
+  `fromIdentifier` varchar(50) DEFAULT NULL,
+  `toIdentifier` varchar(50) DEFAULT NULL,
+  `date` date DEFAULT NULL,
+  `money` double(22,2) DEFAULT 0.00,
+  `gold` double(22,2) DEFAULT 0.00,
+  `reason` varchar(100) DEFAULT NULL,
+  `bankto` varchar(50) DEFAULT NULL,
+  KEY `FK_transactions_banks` (`bank`),
+  KEY `FK_transactions_banks_2` (`bankto`),
+  CONSTRAINT `FK_transactions_banks` FOREIGN KEY (`bank`) REFERENCES `banks` (`name`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `FK_transactions_banks_2` FOREIGN KEY (`bankto`) REFERENCES `banks` (`name`) ON DELETE CASCADE ON UPDATE CASCADE
 )
 COLLATE='utf8mb4_general_ci'
 ENGINE=InnoDB

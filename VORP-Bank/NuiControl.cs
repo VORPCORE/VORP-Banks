@@ -13,6 +13,7 @@ namespace VORP_Bank
         public NuiControl()
         {
             EventHandlers["vorp:refreshBank"] += new Action<double, double>(RefreshBank);
+            EventHandlers["vorp:refreshTransactions"] += new Action<string,string>(RefreshTransactions);
             API.RegisterNuiCallbackType("Deposit");
             EventHandlers["__cfx_nui:Deposit"] += new Action<ExpandoObject>(Deposit);
 
@@ -27,6 +28,35 @@ namespace VORP_Bank
 
             API.RegisterNuiCallbackType("NUIFocusOff");
             EventHandlers["__cfx_nui:NUIFocusOff"] += new Action<ExpandoObject>(NUIFocusOff);
+        }
+
+        private void RefreshTransactions(string transaction,string identifier){
+            JObject data2 = new JObject();
+            if (transaction != "[]")
+            {
+                JArray trans = new JArray();
+                JArray transactions = JArray.Parse(transaction);
+                foreach (var transactionit in transactions)
+                {
+                    JObject obj = new JObject();
+                    obj.Add("date", transactionit["DATE_FORMAT(DATE, '%W %M %e %Y')"]);
+                    obj.Add("money", transactionit["money"]);
+                    obj.Add("gold", transactionit["gold"]);
+                    obj.Add("msg", transactionit["reason"]);
+                    if (transactionit["toIdentifier"].ToString() == identifier)
+                    {
+                        obj.Add("operation", "Received");
+                    }
+                    else
+                    {
+                        obj.Add("operation", "Sended");
+                    }
+                    trans.Add(obj);
+                }
+                data2.Add("action", "updateTransactions");
+                data2.Add("transfers", trans);
+                API.SendNuiMessage(data2.ToString());
+            }
         }
 
         private void RefreshBank(double money, double gold)

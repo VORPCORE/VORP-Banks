@@ -1,6 +1,6 @@
 ﻿using CitizenFX.Core;
 using System;
-
+using Newtonsoft.Json;
 namespace VORP_BankServer
 {
     public class TransferenceC : BaseScript
@@ -89,45 +89,70 @@ namespace VORP_BankServer
             Time = Time - 1;
         }
 
-        public void MakeTransference()
+        private async void RefreshClientTransactions(){
+            PlayerList pl = new PlayerList();
+            Player player1 = null;
+            Player player2 = null;
+            int playerIndex = 1;
+            foreach(Player player in pl){
+                if("steam:"+player.Identifiers["steam"] == FromIdentifier || "steam:"+player.Identifiers["steam"] == ToIdentifier){
+                    switch(playerIndex){
+                        case 1:
+                            player1 = player;
+                        break;
+                        case 2:
+                            player2 = player;
+                        break;
+                    }
+                }
+            }
+            if(player1 != null){
+                //Aqui se hace la busqueda en base de datos para enviarsela
+                string identifier = "steam:" + player1.Identifiers["steam"];
+                dynamic result = await Exports["ghmattimysql"].executeSync("SELECT DATE_FORMAT(DATE, '%W %M %e %Y'),money,gold,reason,toIdentifier FROM transactions WHERE fromIdentifier = ? OR toIdentifier = ?",
+                    new object[] { identifier, identifier });
+                string str = JsonConvert.SerializeObject(result);
+                player1.TriggerEvent("vorp:refreshTransactions",str,identifier);
+            }
+            if(player2 != null){
+                string identifier = "steam:" + player2.Identifiers["steam"];
+                dynamic result = await Exports["ghmattimysql"].executeSync("SELECT DATE_FORMAT(DATE, '%W %M %e %Y'),money,gold,reason,toIdentifier FROM transactions WHERE fromIdentifier = ? OR toIdentifier = ?",
+                    new object[] { identifier, identifier });
+                string str = JsonConvert.SerializeObject(result);
+                player2.TriggerEvent("vorp:refreshTransactions",str,identifier);
+            }
+        }
+
+        public async void MakeTransference()
         {
             Exports["ghmattimysql"].execute("SELECT * FROM bank_users WHERE identifier = ? AND `name` = ?",
             new object[] { ToIdentifier, Banco.Name },
-            new Action<dynamic>((result) =>
+            new Action<dynamic>(async(result) =>
             {
                 if (result != null)
                 {
                     if (result.Count <= 0)
                     {
 
-                        Exports["ghmattimysql"].execute(
+                        await Exports["ghmattimysql"].executeSync(
                             "INSERT INTO bank_users (`name`,`identifier`,`money`,`gold`) VALUES (?,?,?,?)",
-                            new object[] { Bank, ToIdentifier, Money, Gold },
-                            new Action<dynamic>((result2) =>
-                            {
-                                Exports["ghmattimysql"].execute(
-                                    "INSERT INTO transactions (`bank`,`fromIdentifier`,`toIdentifier`,`money`,`gold`,`date`,`reason`,`bankto`) VALUES (?,?,?,?,?,CURDATE(),?,?)",
-                                    new object[] { Bank, FromIdentifier, ToIdentifier, Money, Gold, Subject, BankTo },
-                                    new Action<dynamic>((result4) =>
-                                    {
-                                    }));
-                            }));
+                            new object[] { Bank, ToIdentifier, Money, Gold });
+                            
+                        await Exports["ghmattimysql"].executeSync(
+                            "INSERT INTO transactions (`bank`,`fromIdentifier`,`toIdentifier`,`money`,`gold`,`date`,`reason`,`bankto`) VALUES (?,?,?,?,?,CURDATE(),?,?)",
+                            new object[] { Bank, FromIdentifier, ToIdentifier, Money, Gold, Subject, BankTo });
+                           
                     }
                     else
                     {
-                        Exports["ghmattimysql"].execute(
+                        await Exports["ghmattimysql"].executeSync(
                             "UPDATE bank_users SET money = money+? , gold = gold+?  WHERE `identifier` = ? AND `name` = ?",
-                            new object[] { Money, Gold, ToIdentifier, Banco.Name }, new Action<dynamic>((result3) =>
-                                {
-
-                                }));
-                        Exports["ghmattimysql"].execute(
+                            new object[] { Money, Gold, ToIdentifier, Banco.Name });
+                        await Exports["ghmattimysql"].executeSync(
                             "INSERT INTO transactions (`bank`,`fromIdentifier`,`toIdentifier`,`money`,`gold`,`date`,`reason`,`bankto`) VALUES (?,?,?,?,?,CURDATE(),?,?)",
-                            new object[] { Bank, FromIdentifier, ToIdentifier, Money, Gold, Subject, BankTo },
-                            new Action<dynamic>((result2) =>
-                            {
-                            }));
+                            new object[] { Bank, FromIdentifier, ToIdentifier, Money, Gold, Subject, BankTo });
                     }
+                    RefreshClientTransactions();
                 }
             }));
         }
