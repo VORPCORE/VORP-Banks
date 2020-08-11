@@ -75,8 +75,12 @@ namespace VORP_Bank
                 JObject data = JObject.FromObject(obj);
                 double money = data["money"].ToObject<double>();
                 double gold = data["gold"].ToObject<double>();
-
-                TriggerServerEvent("vorp:bankDeposit", Client.UsedBank, money, gold);
+                //Secure event also in clientside
+                if(money >= 0 && gold >= 0)
+                {
+                    TriggerServerEvent("vorp:bankDeposit", Client.UsedBank, money, gold);
+                }
+                
                 //uno de los dos o los dos pueden tener valor si no tuvieran devuelven 0 
             }
         }
@@ -88,7 +92,10 @@ namespace VORP_Bank
                 JObject data = JObject.FromObject(obj);
                 double money = data["money"].ToObject<double>();
                 double gold = data["gold"].ToObject<double>();
-                TriggerServerEvent("vorp:bankWithdraw", Client.UsedBank, money, gold);
+                if(gold >= 0 && money >= 0)
+                {
+                    TriggerServerEvent("vorp:bankWithdraw", Client.UsedBank, money, gold);
+                }
                 //uno de los dos o los dos pueden tener valor si no tuvieran devuelven 0 
             }
         }
@@ -128,7 +135,10 @@ namespace VORP_Bank
                 double gold = double.Parse(data["gold"].ToString());
                 bool useInstantTax = data["instant"].ToObject<bool>();
                 string subject = data["subject"].ToString();
-                TriggerServerEvent("vorp:bankTrasference", steamId, money, gold, useInstantTax, Client.UsedBank, subject);
+                if(gold >= 0 && money >= 0)
+                {
+                    TriggerServerEvent("vorp:bankTrasference", steamId, money, gold, useInstantTax, Client.UsedBank, subject);
+                }               
             }
         }
 
