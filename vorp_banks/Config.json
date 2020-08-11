@@ -1,18 +1,51 @@
 ﻿{
+  //---------LANGUAGE------------------------------//
+  "defaultlang": "Es",
+  //-----------------------------------------------//
+  //Dont touch database sentences if you dont know how it works you will broke your database
+  "banksSQL": "CREATE TABLE IF NOT EXISTS `banks`(\n`name` VARCHAR(50) NOT NULL,\nPRIMARY KEY (`name`)\n);",
+  "bankUsersSQL": "CREATE TABLE IF NOT EXISTS `bank_users`(\n`name` varchar(50) NOT NULL,\n`identifier` varchar(50) NOT NULL,\n`money` double(22,2) DEFAULT 0.00,\n`gold` double(22,2) DEFAULT 0.00,\nKEY `name` (`name`),\nCONSTRAINT `bank` FOREIGN KEY (`name`) REFERENCES `banks` (`name`) ON DELETE CASCADE ON UPDATE CASCADE\n);",
+  "bankTransactionsSQL": "CREATE TABLE IF NOT EXISTS `transactions`(\n`bank` varchar(50) DEFAULT NULL,\n`fromIdentifier` varchar(50) DEFAULT NULL,\n`toIdentifier` varchar(50) DEFAULT NULL,\n`date` date DEFAULT NULL,\n`money` double(22,2) DEFAULT 0.00,\n`gold` double(22,2) DEFAULT 0.00,\n`reason` varchar(100) DEFAULT NULL,\n`bankto` varchar(50) DEFAULT NULL,\nKEY `FK_transactions_banks` (`bank`),\nKEY `FK_transactions_banks_2` (`bankto`),\nCONSTRAINT `FK_transactions_banks` FOREIGN KEY (`bank`) REFERENCES `banks` (`name`) ON DELETE CASCADE ON UPDATE CASCADE,\nCONSTRAINT `FK_transactions_banks_2` FOREIGN KEY (`bankto`) REFERENCES `banks` (`name`) ON DELETE CASCADE ON UPDATE CASCADE\n);",
+  //-----------------------------------------------//
+  "time": 30,
+  "transferenceCost": 10,
   "Banks": [
     {
       "name": "SaintDenis", //Dont touch
-      "hudName":"SAINT DENIS",
+      "hudName": "SAINT DENIS",
       "blipName": "Saint Denis Bank",
       "blipHash": -2128054417,
-      "coords": {"x": -341.07,"y": 767.35 ,"z": 116.71}
+      "coords": {
+        "x": -341.07,
+        "y": 767.35,
+        "z": 116.71
+      },
+      "npcCoords": {
+        "x": -341.07,
+        "y": 767.35,
+        "z": 116.71,
+        "h": 0.0 //NPC Heading
+      },
+      "NPCModel": "" //NPC model that you want in this bank
     },
     {
       "name": "BlackWater", //Dont touch
-      "hudName":"BLACK WATER",
+      "hudName": "BLACK WATER",
       "blipName": "Black Water Bank",
       "blipHash": -2128054417,
-      "coords": {"x": -322.12,"y": 804.0 ,"z": 117.88}
+      "coords": {
+        "x": -322.12,
+        "y": 804.0,
+        "z": 117.88
+      },
+
+      "npcCoords": {
+        "x": -322.12,
+        "y": 804.0,
+        "z": 117.88,
+        "h": 0.0 //NPC Heading
+      },
+      "NPCModel": "" //NPC model that you want in this bank
     }
   ]
 }

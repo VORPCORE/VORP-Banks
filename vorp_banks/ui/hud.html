@@ -262,7 +262,7 @@
                     subject: reason,
                     money: dollars,
                     gold: golds,
-                    isntant: isInstant
+                    instant: isInstant
                 }));
 
             });
@@ -329,6 +329,16 @@
                     } else if (data.action === "updateNumbers") {
                         document.getElementById("dollars").innerText = data.money;
                         document.getElementById("gold").innerText = data.gold;
+                    }else if(data.action === "updateTransactions"){
+                        data.transfers.forEach(element => {
+                            $('#transfer-log').append(" <tr>" +
+                                "<th>" + element.date + "</th>" +
+                                "<th>" + element.money + "</th>" +
+                                "<th>" + element.gold + "</th>" +
+                                "<th>" + element.msg + "</th>" +
+                                "<th>" + element.operation + "</th>" +
+                                "</tr>");
+                        });
                     }
 
                 }

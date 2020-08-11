@@ -46,6 +46,9 @@ namespace VORP_BankServer
                     Console.WriteLine($"{API.GetCurrentResourceName()}: {Config["defaultlang"]}.json Not Found");
                     Console.ForegroundColor = ConsoleColor.White;
                 }
+                foreach(var x in Langs) {
+                    Debug.WriteLine(x.Key);
+                }
             }
             else
             {

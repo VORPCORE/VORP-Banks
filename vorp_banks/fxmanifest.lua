@@ -28,7 +28,8 @@ files {
   'ui/data/js/progressbar.min.js.map',
   'ui/data/background.png',
   'ui/hud.html',
-  'Config.json'
+  'Config.json',
+  'Es.json'
 }
 
 ui_page 'ui/hud.html'
