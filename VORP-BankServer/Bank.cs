@@ -76,6 +76,8 @@ namespace VORP_BankServer
 
         public void Withdraw([FromSource] Player source, double money, double gold)
         {
+            if (!_bankUsers.ContainsKey("steam:" + source.Identifiers["steam"])) return;
+            
             if (money > 0)
             {
                 if (SubUserMoney("steam:" + source.Identifiers["steam"], money))
