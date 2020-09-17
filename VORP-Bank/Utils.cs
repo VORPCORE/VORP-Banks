@@ -59,9 +59,11 @@ namespace VORP_Bank
                 while (!API.DoesEntityExist(_PedBank))
                 {
                     await Delay(2000);
-                    API.DeleteEntity(ref _PedBank);
-                    if(!API.DoesEntityExist(_PedBank))
+                    if(!API.DoesEntityExist(_PedBank)){
+                    
+                        API.DeleteEntity(ref _PedBank);
                         _PedBank = await CreatePed(HashPed, bank);
+                    }
                 }
                 Function.Call((Hash)0x283978A15512B2FE, _PedBank, true);
                 Peds.Add(_PedBank);
