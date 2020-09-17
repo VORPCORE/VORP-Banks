@@ -1,4 +1,4 @@
-﻿using CitizenFX.Core;
+using CitizenFX.Core;
 using CitizenFX.Core.Native;
 using Newtonsoft.Json.Linq;
 using System;
@@ -40,13 +40,29 @@ namespace VORP_Bank
             }
         }
 
+        public static async Task<int> CreatePed(uint HashPed, JToken bank)
+        {
+            API.RequestModel(HashPed, true);
+            while (!API.HasModelLoaded(HashPed))
+                await Delay(2000);
+            return API.CreatePed(HashPed, bank["npcCoords"]["x"].ToObject<float>(), bank["npcCoords"]["y"].ToObject<float>(),
+                   bank["npcCoords"]["z"].ToObject<float>(), bank["npcCoords"]["h"].ToObject<float>(), false, true, true, true);
+        }
+
         public static async void CreatePeds(JToken banks)
         {
             foreach(JToken bank in banks)
             {
-                uint HashPed = (uint)API.GetHashKey(bank["NPCModel"].ToString());
-                int _PedBank = API.CreatePed(HashPed, bank["npcCoords"]["x"].ToObject<float>(), bank["npcCoords"]["y"].ToObject<float>(),
-                    bank["npcCoords"]["z"].ToObject<float>(), bank["npcCoords"]["h"].ToObject<float>(), false, true, true, true);
+                uint HashPed = (uint)API.GetHashKey(bank["NPCModel"].ToString());                
+                int _PedBank = await CreatePed(HashPed, bank);
+                await Delay(2000);
+                while (!API.DoesEntityExist(_PedBank))
+                {
+                    await Delay(2000);
+                    API.DeleteEntity(ref _PedBank);
+                    if(!API.DoesEntityExist(_PedBank))
+                        _PedBank = await CreatePed(HashPed, bank);
+                }
                 Function.Call((Hash)0x283978A15512B2FE, _PedBank, true);
                 Peds.Add(_PedBank);
                 API.SetEntityNoCollisionEntity(API.PlayerPedId(), _PedBank, false);
