@@ -13,7 +13,7 @@ namespace VORP_BankServer
     {
 
         public static List<TransferenceC> TransferenceList = new List<TransferenceC>();
-
+        public static dynamic CORE;
         public Server()
         {
             EventHandlers["vorp:bankDeposit"] += new Action<Player, string, double, double>(Deposit);
@@ -22,6 +22,10 @@ namespace VORP_BankServer
             Delay(100);
             RegisterEvents();
             Tick += ExecuteTransaction;
+            TriggerEvent("getCore", new Action<dynamic>((core) =>
+             {
+                 CORE = core;
+             }));
             API.RegisterCommand("BaseDatos", new Action<dynamic, dynamic, dynamic>(async (x, y, z) =>
             {
                 dynamic result2 = await Exports["ghmattimysql"].executeSync("SELECT DATE_FORMAT(DATE, '%W %M %e %Y'),money,gold,reason,toIdentifier FROM transactions WHERE fromIdentifier = ? OR toIdentifier = ?",

@@ -9,7 +9,7 @@ namespace VORP_BankServer
     public class Bank : BaseScript
     {
         private string _name;
-        private Dictionary<string, BankUser> _bankUsers = new Dictionary<string, BankUser>();
+        private Dictionary<Tuple<string,int>, BankUser> _bankUsers = new Dictionary<Tuple<string,int>, BankUser>();
 
         public string Name
         {
@@ -17,7 +17,7 @@ namespace VORP_BankServer
             set => _name = value;
         }
 
-        public Dictionary<string, BankUser> BankUsers
+        public Dictionary<Tuple<string,int>, BankUser> BankUsers
         {
             get => _bankUsers;
             set => _bankUsers = value;
@@ -47,26 +47,41 @@ namespace VORP_BankServer
             return false;
         }
 
+        public Tuple<string,int> GetUserTuple(Player player)
+        {
+            string steam = "steam:" + player.Identifiers["steam"];
+            dynamic UserCharacter = Server.CORE.getUser(int.Parse(player.Handle)).getUsedCharacter;
+            int charidentifier = UserCharacter.charIdentifier;
+            Tuple<string, int> auxtuple = new Tuple<string, int>(steam, charidentifier);
+            return auxtuple;
+        }
+
+        public int GetCharacterId()
+        {
+            dynamic UserCharacter = Server.CORE.getUser(int.Parse(player.Handle)).getUsedCharacter;
+            return charidentifier = UserCharacter.charIdentifier;
+        }
+
         public bool Transference(Player playerSend, string toSteamId, double gold, double money, bool instant, string subject)
         {
             string steam = "steam:" + playerSend.Identifiers["steam"];
             bool done = false;
             double auxmoney = money;
             if (instant) auxmoney = money + LoadConfig.Config["transferenceCost"].ToObject<double>();
-            if (_bankUsers[steam].SubMoney(auxmoney) && _bankUsers[steam].SubGold(gold))
+            if (_bankUsers[GetUserTuple(playerSend)].SubMoney(auxmoney) && _bankUsers[GetUserTuple(playerSend)].SubGold(gold))
             {
                 TransferenceC newTransference = new TransferenceC("steam:" + playerSend.Identifiers["steam"], toSteamId, money, gold, subject, Name, Name, LoadConfig.Config["time"].ToObject<int>(), this);
                 if (instant)
                 {
                     newTransference.MakeTransference();
-                    playerSend.TriggerEvent("vorp:refreshBank", _bankUsers[steam].Money,
-                        _bankUsers[steam].Gold);
+                    playerSend.TriggerEvent("vorp:refreshBank", _bankUsers[GetUserTuple(playerSend)].Money,
+                        _bankUsers[GetUserTuple(playerSend)].Gold);
                     return true;
                 }
                 else
                 {
-                    if (IsUserConnected(steam)) playerSend.TriggerEvent("vorp:refreshBank", _bankUsers[steam].Money,
-                         _bankUsers[steam].Gold);
+                    if (IsUserConnected(steam)) playerSend.TriggerEvent("vorp:refreshBank", _bankUsers[GetUserTuple(playerSend)].Money,
+                         _bankUsers[GetUserTuple(playerSend)].Gold);
                     Server.TransferenceList.Add(newTransference);
                     return true;
                 }
@@ -76,7 +91,7 @@ namespace VORP_BankServer
 
         public void Withdraw([FromSource] Player source, double money, double gold)
         {
-            if (!_bankUsers.ContainsKey("steam:" + source.Identifiers["steam"])) return;
+            if (!_bankUsers.ContainsKey(GetUserTuple(source))) return;
             
             if (money > 0)
             {
@@ -95,22 +110,22 @@ namespace VORP_BankServer
                     //Evento que actualiza el banco
                 }
             }
-            source.TriggerEvent("vorp:refreshBank", _bankUsers["steam:" + source.Identifiers["steam"]].Money,
-                _bankUsers["steam:" + source.Identifiers["steam"]].Gold);
+            source.TriggerEvent("vorp:refreshBank", _bankUsers[GetUserTuple(source)].Money,
+                _bankUsers[GetUserTuple(source)].Gold);
         }
 
         public async Task<bool> CheckAndRegister(string steamId, string Name)
         {
-            dynamic result = await Exports["ghmattimysql"].executeSync("SELECT * FROM bank_users WHERE identifier = ? AND `name` = ?",
-                    new object[] { steamId, Name });
+            dynamic result = await Exports["ghmattimysql"].executeSync("SELECT * FROM bank_users WHERE identifier = ? AND `name` = ? and charidentifier = ?",
+                    new object[] { steamId, Name, GetCharacterId() });
             if (int.Parse(result.Count.ToString()) > 0)
             {
                 return true;
             }
             else
             {
-                dynamic result2 = await Exports["ghmattimysql"].executeSync("INSERT INTO bank_users (`name`,`identifier`,`money`,`gold`) VALUES (?,?,?,?)",
-                                      new object[] { Name, steamId, 0.0, 0.0 });
+                dynamic result2 = await Exports["ghmattimysql"].executeSync("INSERT INTO bank_users (`name`,`identifier`,`money`,`gold`,`charidentifier`) VALUES (?,?,?,?,?)",
+                                      new object[] { Name, steamId, 0.0, 0.0 , GetCharacterId() });
                 if (int.Parse(result2.affectedRows.ToString()) > 0)
                 {
                     return true;
@@ -145,8 +160,8 @@ namespace VORP_BankServer
                         TriggerEvent("vorp:removeMoney", int.Parse(source.Handle), 1, gold);
                         AddUserGold("steam:" + source.Identifiers["steam"], gold);
                     }
-                    source.TriggerEvent("vorp:refreshBank", _bankUsers[steamId].Money,
-                        _bankUsers[steamId].Gold);
+                    source.TriggerEvent("vorp:refreshBank", _bankUsers[GetUserTuple(source)].Money,
+                        _bankUsers[GetUserTuple(source)].Gold);
                 }
             }));
         }
