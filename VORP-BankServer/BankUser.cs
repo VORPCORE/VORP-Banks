@@ -7,6 +7,7 @@ namespace VORP_BankServer
     {
         private string _bank;
         private string _identifier;
+        private int _charidentifier;
         private double _money;
         private double _gold;
 
@@ -18,6 +19,7 @@ namespace VORP_BankServer
             public string subject;
             public string operation;
             public double gold;
+            public int charidentifier;
         }
 
         public List<Transference> Transferences
@@ -38,6 +40,12 @@ namespace VORP_BankServer
             set => _identifier = value;
         }
 
+        public int CharIdentifier
+        {
+            get => _charidentifier;
+            set => _charidentifier = value;
+        }
+
         public double Money
         {
             get => _money;
@@ -45,8 +53,8 @@ namespace VORP_BankServer
             {
                 _money = value;
                 Exports["ghmattimysql"].execute(
-                    $"UPDATE bank_users SET money = ? WHERE identifier=? and name =?;",
-                    new object[] { value, _identifier, _bank }
+                    $"UPDATE bank_users SET money = ? WHERE identifier=? and name =? and charidentifier = ?;",
+                    new object[] { value, _identifier, _bank,_charidentifier }
                 );
             }
         }
@@ -58,18 +66,19 @@ namespace VORP_BankServer
             {
                 _gold = value;
                 Exports["ghmattimysql"].execute(
-                    $"UPDATE bank_users SET gold = ? WHERE identifier=? and name =?;",
-                    new object[] { value, _identifier, _bank }
+                    $"UPDATE bank_users SET gold = ? WHERE identifier=? and name =? and charidentifier = ?;",
+                    new object[] { value, _identifier, _bank,_charidentifier }
                 );
             }
         }
 
-        public BankUser(string bank, string identifier, double money, double gold)
+        public BankUser(string bank, string identifier,int charidentifier, double money, double gold)
         {
             _bank = bank;
             _identifier = identifier;
             _money = money;
             _gold = gold;
+            _charidentifier = charidentifier;
         }
 
         public bool AddMoney(double money)
