@@ -133,32 +133,30 @@ namespace VORP_BankServer
             }
         }
 
-        public void Deposit([FromSource] Player source, double money, double gold)
+        public async void Deposit([FromSource] Player source, double money, double gold)
         {
-            TriggerEvent("vorp:getCharacter", int.Parse(source.Handle), new Action<dynamic>(async (user) =>
+            dynamic UserCharacter = Server.CORE.getUser(int.Parse(source.Handle)).getUsedCharacter;
+            double newMoney = UserCharacter.money - money;
+            double newGold = UserCharacter.gold - gold;
+            string steamId = "steam:" + source.Identifiers["steam"];
+            Task<bool> resultadoConsulta = CheckAndRegister(steamId, Name, source);
+            await resultadoConsulta;
+            if (resultadoConsulta.Result)
             {
-                double newMoney = user.money - money;
-                double newGold = user.gold - gold;
-                string steamId = "steam:" + source.Identifiers["steam"];
-                Task<bool> resultadoConsulta = CheckAndRegister(steamId, Name,source);
-                await resultadoConsulta;
-                if (resultadoConsulta.Result)
+                if (newMoney >= 0)
                 {
-                    if (newMoney >= 0)
-                    {
-                        TriggerEvent("vorp:removeMoney", int.Parse(source.Handle ), 0, money);
-                        AddUserMoney(GetUserTuple(source), money);
-                    }
-
-                    if (newGold >= 0)
-                    {
-                        TriggerEvent("vorp:removeMoney", int.Parse(source.Handle), 1, gold);
-                        AddUserGold(GetUserTuple(source), gold);
-                    }
-                    source.TriggerEvent("vorp:refreshBank", _bankUsers[GetUserTuple(source)].Money,
-                        _bankUsers[GetUserTuple(source)].Gold);
+                    UserCharacter.removeCurrency(0, money);
+                    AddUserMoney(GetUserTuple(source), money);
                 }
-            }));
+
+                if (newGold >= 0)
+                {
+                    UserCharacter.removeCurrency(1, gold);
+                    AddUserGold(GetUserTuple(source), gold);
+                }
+                source.TriggerEvent("vorp:refreshBank", _bankUsers[GetUserTuple(source)].Money,
+                    _bankUsers[GetUserTuple(source)].Gold);
+            }
         }
 
         public bool AddUser(BankUser newUser)
@@ -173,16 +171,21 @@ namespace VORP_BankServer
             return false;
         }
 
-        public bool RemoveUser(string identifier,int charidentifier)
+        public void RemoveUser(string identifier)
         {
-            Tuple<string, int> aux = new Tuple<string, int>(identifier, charidentifier);
-            if (_bankUsers.ContainsKey(aux))
+            List<Tuple<string, int>> auxiliar = new List<Tuple<string, int>>();
+            foreach(KeyValuePair<Tuple<string,int>,BankUser> aux in _bankUsers)
             {
-                _bankUsers.Remove(aux);
-                return true;
+                if(aux.Key.Item1 == identifier)
+                {
+                    auxiliar.Add(aux.Key);
+                }
             }
-
-            return false;
+            
+            foreach(Tuple<string,int> ident in auxiliar)
+            {
+                _bankUsers.Remove(ident);
+            }
         }
 
         //If user is in bank it return user else it returns null value

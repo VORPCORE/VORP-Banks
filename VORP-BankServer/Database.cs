@@ -43,6 +43,7 @@ namespace VORP_BankServer
         {
 
             string steamId = "steam:" + player.Identifiers["steam"];
+
             foreach (KeyValuePair<string, Bank> bank in Database.Banks)
             {
                 bank.Value.RemoveUser(steamId);
@@ -72,7 +73,7 @@ namespace VORP_BankServer
                                 {
                                     Bank aux = Database.Banks[user.name.ToString()];
                                     aux.AddUser(new BankUser(aux.Name,
-                                        user.identifier.ToString(), double.Parse(user.money.ToString()), double.Parse(user.gold.ToString())
+                                        user.identifier.ToString(),int.Parse(user.charidentifier.ToString()),double.Parse(user.money.ToString()), double.Parse(user.gold.ToString())
                                         ));
                                 }
                             }
