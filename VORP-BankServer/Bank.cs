@@ -26,11 +26,6 @@ namespace VORP_BankServer
         public Bank(string name)
         {
             _name = name;
-            API.RegisterCommand("Comprobar", new Action<dynamic, dynamic, dynamic>(async (x, y, z) =>
-            {
-                Task<bool> result = CheckAndRegister("steam:11000011062b830", "BlackWater");
-                await result;
-            }), false);
         }
 
         public static bool IsUserConnected(string steamId)
@@ -56,10 +51,10 @@ namespace VORP_BankServer
             return auxtuple;
         }
 
-        public int GetCharacterId()
+        public int GetCharacterId(Player source)
         {
-            dynamic UserCharacter = Server.CORE.getUser(int.Parse(player.Handle)).getUsedCharacter;
-            return charidentifier = UserCharacter.charIdentifier;
+            dynamic UserCharacter = Server.CORE.getUser(int.Parse(source.Handle)).getUsedCharacter;
+            return UserCharacter.charIdentifier;
         }
 
         public bool Transference(Player playerSend, string toSteamId, double gold, double money, bool instant, string subject)
@@ -95,7 +90,7 @@ namespace VORP_BankServer
             
             if (money > 0)
             {
-                if (SubUserMoney("steam:" + source.Identifiers["steam"], money))
+                if (SubUserMoney(GetUserTuple(source), money))
                 {
                     TriggerEvent("vorp:addMoney", int.Parse(source.Handle), 0, money);
                     //Evento que actualiza el banco
@@ -104,7 +99,7 @@ namespace VORP_BankServer
 
             if (gold > 0)
             {
-                if (SubUserGold("steam:" + source.Identifiers["steam"], gold))
+                if (SubUserGold(GetUserTuple(source), gold))
                 {
                     TriggerEvent("vorp:addMoney", int.Parse(source.Handle), 1, gold);
                     //Evento que actualiza el banco
@@ -114,10 +109,10 @@ namespace VORP_BankServer
                 _bankUsers[GetUserTuple(source)].Gold);
         }
 
-        public async Task<bool> CheckAndRegister(string steamId, string Name)
+        public async Task<bool> CheckAndRegister(string steamId, string Name,Player source)
         {
             dynamic result = await Exports["ghmattimysql"].executeSync("SELECT * FROM bank_users WHERE identifier = ? AND `name` = ? and charidentifier = ?",
-                    new object[] { steamId, Name, GetCharacterId() });
+                    new object[] { steamId, Name, GetCharacterId(source) });
             if (int.Parse(result.Count.ToString()) > 0)
             {
                 return true;
@@ -125,7 +120,7 @@ namespace VORP_BankServer
             else
             {
                 dynamic result2 = await Exports["ghmattimysql"].executeSync("INSERT INTO bank_users (`name`,`identifier`,`money`,`gold`,`charidentifier`) VALUES (?,?,?,?,?)",
-                                      new object[] { Name, steamId, 0.0, 0.0 , GetCharacterId() });
+                                      new object[] { Name, steamId, 0.0, 0.0 , GetCharacterId(source) });
                 if (int.Parse(result2.affectedRows.ToString()) > 0)
                 {
                     return true;
@@ -145,20 +140,20 @@ namespace VORP_BankServer
                 double newMoney = user.money - money;
                 double newGold = user.gold - gold;
                 string steamId = "steam:" + source.Identifiers["steam"];
-                Task<bool> resultadoConsulta = CheckAndRegister(steamId, Name);
+                Task<bool> resultadoConsulta = CheckAndRegister(steamId, Name,source);
                 await resultadoConsulta;
                 if (resultadoConsulta.Result)
                 {
                     if (newMoney >= 0)
                     {
-                        TriggerEvent("vorp:removeMoney", int.Parse(source.Handle), 0, money);
-                        AddUserMoney("steam:" + source.Identifiers["steam"], money);
+                        TriggerEvent("vorp:removeMoney", int.Parse(source.Handle ), 0, money);
+                        AddUserMoney(GetUserTuple(source), money);
                     }
 
                     if (newGold >= 0)
                     {
                         TriggerEvent("vorp:removeMoney", int.Parse(source.Handle), 1, gold);
-                        AddUserGold("steam:" + source.Identifiers["steam"], gold);
+                        AddUserGold(GetUserTuple(source), gold);
                     }
                     source.TriggerEvent("vorp:refreshBank", _bankUsers[GetUserTuple(source)].Money,
                         _bankUsers[GetUserTuple(source)].Gold);
@@ -168,20 +163,22 @@ namespace VORP_BankServer
 
         public bool AddUser(BankUser newUser)
         {
-            if (!_bankUsers.ContainsKey(newUser.Identifier))
+            Tuple<string, int> aux = new Tuple<string, int>(newUser.Identifier, newUser.CharIdentifier);
+            if (!_bankUsers.ContainsKey(aux))
             {
-                _bankUsers.Add(newUser.Identifier, newUser);
+                _bankUsers.Add(aux, newUser);
                 return true;
             }
 
             return false;
         }
 
-        public bool RemoveUser(string identifier)
+        public bool RemoveUser(string identifier,int charidentifier)
         {
-            if (_bankUsers.ContainsKey(identifier))
+            Tuple<string, int> aux = new Tuple<string, int>(identifier, charidentifier);
+            if (_bankUsers.ContainsKey(aux))
             {
-                _bankUsers.Remove(identifier);
+                _bankUsers.Remove(aux);
                 return true;
             }
 
@@ -189,71 +186,72 @@ namespace VORP_BankServer
         }
 
         //If user is in bank it return user else it returns null value
-        public BankUser GetUser(string identifier)
+        public BankUser GetUser(string identifier,int charidentifier)
         {
-            if (_bankUsers.ContainsKey(identifier))
+            Tuple<string, int> aux = new Tuple<string, int>(identifier, charidentifier);
+            if (_bankUsers.ContainsKey(aux))
             {
-                return _bankUsers[identifier];
+                return _bankUsers[aux];
             }
 
             return null;
         }
 
         //Pensar que puede ser que le este dando pasta a otra persona y que haya que registrarla en el banco pero no en la bd y viceversa
-        public bool AddUserMoney(string steamId, double money)
+        public bool AddUserMoney(Tuple<string,int> aux,double money)
         {
-            if (_bankUsers.ContainsKey(steamId))
+            if (_bankUsers.ContainsKey(aux))
             {
-                return _bankUsers[steamId].AddMoney(money);
+                return _bankUsers[aux].AddMoney(money);
             }
             Exports["ghmattimysql"].execute(
-                $"UPDATE bank_users SET money = money + ? WHERE identifier=? and name = ?",
-                new object[] { money, steamId, _name }
+                $"UPDATE bank_users SET money = money + ? WHERE identifier=? and name = ? and charidentifier = ?",
+                new object[] { money, aux.Item1, _name,aux.Item2 }
             );
-            if (IsUserConnected(steamId))
+            if (IsUserConnected(aux.Item1))
             {
-                BankUser newUser = new BankUser(Name, steamId, money, 0.0);
-                _bankUsers.Add(steamId, newUser);
+                BankUser newUser = new BankUser(Name, aux.Item1, aux.Item2 ,money, 0.0);
+                _bankUsers.Add(aux, newUser);
                 return true;
             }
             return true;
         }
 
-        public bool SubUserMoney(string steamId, double money)
+        public bool SubUserMoney(Tuple<string,int> aux ,double money)
         {
-            if (_bankUsers.ContainsKey(steamId))
+            if (_bankUsers.ContainsKey(aux))
             {
-                return _bankUsers[steamId].SubMoney(money);
+                return _bankUsers[aux].SubMoney(money);
             }
 
             return false;
         }
 
-        public bool AddUserGold(string steamId, double gold)
+        public bool AddUserGold(Tuple<string,int> aux, double gold)
         {
-            if (_bankUsers.ContainsKey(steamId))
+            if (_bankUsers.ContainsKey(aux))
             {
-                return _bankUsers[steamId].AddGold(gold);
+                return _bankUsers[aux].AddGold(gold);
             }
 
             Exports["ghmattimysql"].execute(
-                $"UPDATE bank_users SET gold = gold + ? WHERE identifier=? and name = ?",
-                new object[] { gold, steamId, _name }
+                $"UPDATE bank_users SET gold = gold + ? WHERE identifier=? and name = ? and charidentifier = ?",
+                new object[] { gold, aux.Item1, _name,aux.Item2 }
             );
 
-            if (IsUserConnected(steamId))
+            if (IsUserConnected(aux.Item1))
             {
-                BankUser newUser = new BankUser(Name, steamId, 0.0, gold);
-                _bankUsers.Add(steamId, newUser);
+                BankUser newUser = new BankUser(Name, aux.Item1,aux.Item2, 0.0, gold);
+                _bankUsers.Add(aux, newUser);
             }
             return true;
         }
 
-        public bool SubUserGold(string steamId, double money)
+        public bool SubUserGold(Tuple<string,int> aux, double money)
         {
-            if (_bankUsers.ContainsKey(steamId))
+            if (_bankUsers.ContainsKey(aux))
             {
-                return _bankUsers[steamId].SubGold(money);
+                return _bankUsers[aux].SubGold(money);
             }
 
             return false;
