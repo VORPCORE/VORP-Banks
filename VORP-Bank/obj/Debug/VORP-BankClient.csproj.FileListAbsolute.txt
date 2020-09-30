@@ -20,3 +20,7 @@ D:\[VORP]\VORP-Banks\VORP-Bank\obj\Debug\VORP-Bank.net.dll
 D:\[VORP]\VORP-Banks\VORP-Bank\obj\Debug\VORP-Bank.net.pdb
 D:\redmlosreyes\server-data\resources\[VORP]\vorp_banks\VORP-Bank.net.dll
 D:\redmlosreyes\server-data\resources\[VORP]\vorp_banks\VORP-Bank.net.pdb
+D:\VORP-Repos\VORP-Banks\VORP-Bank\obj\Debug\VORP-BankClient.csprojAssemblyReference.cache
+D:\VORP-Repos\VORP-Banks\VORP-Bank\obj\Debug\VORP-BankClient.csproj.CoreCompileInputs.cache
+D:\VORP-Repos\VORP-Banks\VORP-Bank\obj\Debug\VORP-Bank.net.dll
+D:\VORP-Repos\VORP-Banks\VORP-Bank\obj\Debug\VORP-Bank.net.pdb

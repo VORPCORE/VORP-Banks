@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-/*PROPERTY OF KLC_BY AVILILLA*/
+
 namespace VORP_Bank
 {
     public class Utils : BaseScript

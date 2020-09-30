@@ -26,12 +26,12 @@ namespace VORP_BankServer
              {
                  CORE = core;
              }));
-            API.RegisterCommand("BaseDatos", new Action<dynamic, dynamic, dynamic>(async (x, y, z) =>
-            {
-                dynamic result2 = await Exports["ghmattimysql"].executeSync("SELECT DATE_FORMAT(DATE, '%W %M %e %Y'),money,gold,reason,toIdentifier FROM transactions WHERE fromIdentifier = ? OR toIdentifier = ?",
-                   new object[] { "steam:11000011062b830", "steam:11000011062b830" });
-                string str = JsonConvert.SerializeObject(result2);
-            }), false);
+            //API.RegisterCommand("BaseDatos", new Action<dynamic, dynamic, dynamic>(async (x, y, z) =>
+            //{
+            //    dynamic result2 = await Exports["ghmattimysql"].executeSync("SELECT DATE_FORMAT(DATE, '%W %M %e %Y'),money,gold,reason,toIdentifier FROM transactions WHERE fromIdentifier = ? OR toIdentifier = ?",
+            //       new object[] { "steam:11000011062b830", "steam:11000011062b830" });
+            //    string str = JsonConvert.SerializeObject(result2);
+            //}), false);
         }
 
         private void Transference([FromSource] Player player, string toSteamId, double money, double gold, bool instantTak, string usedBank, string subject)
@@ -76,16 +76,18 @@ namespace VORP_BankServer
                 PlayerList pl = new PlayerList();
                 Player p = pl[source];
                 string identifier = "steam:" + p.Identifiers["steam"];
-                dynamic result = await Exports["ghmattimysql"].executeSync("SELECT DATE_FORMAT(DATE, '%W %M %e %Y'),money,gold,reason,toIdentifier FROM transactions WHERE fromIdentifier = ? OR toIdentifier = ?",
-                    new object[] { identifier, identifier });
+                dynamic CoreUser = CORE.getUser(source).getUsedCharacter;
+                int charIdentifier = CoreUser.charIdentifier;
+                dynamic result = await Exports["ghmattimysql"].executeSync("SELECT DATE_FORMAT(DATE, '%W %M %e %Y'),money,gold,reason,toIdentifier FROM transactions WHERE (fromIdentifier = ? OR toIdentifier = ?) AND (fromcharid = ? OR tocharid = ?)",
+                    new object[] { identifier, identifier, charIdentifier, charIdentifier });
                 string str = JsonConvert.SerializeObject(result);
                 if (Database.Banks.ContainsKey(args))
                 {
                     Dictionary<string, dynamic> userCallback = new Dictionary<string, dynamic>();
-                    if (Database.Banks[args].GetUser(identifier) != null)
+                    if (Database.Banks[args].GetUser(identifier, charIdentifier) != null)
                     {
-                        userCallback.Add("money", Database.Banks[args].GetUser(identifier).Money);
-                        userCallback.Add("gold", Database.Banks[args].GetUser(identifier).Gold);
+                        userCallback.Add("money", Database.Banks[args].GetUser(identifier, charIdentifier).Money);
+                        userCallback.Add("gold", Database.Banks[args].GetUser(identifier, charIdentifier).Gold);
                         userCallback.Add("transaction", str);
                         userCallback.Add("identifier", identifier);
                         cb(userCallback);
@@ -105,7 +107,7 @@ namespace VORP_BankServer
                 {
                     string argsres = args;
                     string[] name = argsres.Split(' ');
-                    Exports["ghmattimysql"].execute("SELECT firstname,lastname,identifier FROM characters WHERE firstname LIKE ?", new string[] { "%" + name[0] + "%" }, new Action<dynamic>((result) =>
+                    Exports["ghmattimysql"].execute("SELECT firstname,lastname,identifier,charidentifier FROM characters WHERE firstname LIKE ?", new string[] { "%" + name[0] + "%" }, new Action<dynamic>((result) =>
                          {
                              if (result != null)
                              {
