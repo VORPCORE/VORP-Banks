@@ -12,6 +12,7 @@ ENGINE=InnoDB
 CREATE TABLE `bank_users` (
 	`name` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_general_ci',
 	`identifier` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_general_ci',
+  `charidentifier` INT(11) NOT NULL,
 	`money` DOUBLE(22,0) NULL DEFAULT '0',
 	`gold` DOUBLE(22,0) NULL DEFAULT '0',
 	INDEX `name` (`name`) USING BTREE,
@@ -24,7 +25,9 @@ ENGINE=InnoDB
 CREATE TABLE `transactions` (
 	`bank` varchar(50) DEFAULT NULL,
   `fromIdentifier` varchar(50) DEFAULT NULL,
+  `fromcharidentifier` INT(11) NOT NULL,
   `toIdentifier` varchar(50) DEFAULT NULL,
+  `tocharidentifier` INT(11) NOT NULL,
   `date` date DEFAULT NULL,
   `money` double(22,2) DEFAULT 0.00,
   `gold` double(22,2) DEFAULT 0.00,
