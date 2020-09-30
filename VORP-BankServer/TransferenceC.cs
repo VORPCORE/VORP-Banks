@@ -7,6 +7,8 @@ namespace VORP_BankServer
     {
         private string _fromIdentifier;
         private string _toIdentifier;
+        private int _fromCharId;
+        private int _toCharId;
         private double _money;
         private double _gold;
         private string _subject;
@@ -69,12 +71,25 @@ namespace VORP_BankServer
             set => _toIdentifier = value;
         }
 
+        public int ToCharId
+        {
+            get => _toCharId;
+            set => _toCharId = value;
+        }
 
-        public TransferenceC(string fromIdentifier, string toIdentifier, double money, double gold,
+        public int FromCharId
+        {
+            get => _fromCharId;
+            set => _fromCharId = value;
+        }
+
+        public TransferenceC(string fromIdentifier, int fromCharId, string toIdentifier, int toCharId, double money, double gold,
             string subject, string bankto, string bank, int time, Bank banco)
         {
             FromIdentifier = fromIdentifier;
+            FromCharId = fromCharId;
             ToIdentifier = toIdentifier;
+            ToCharId = toCharId;
             Money = money;
             Gold = gold;
             Subject = subject;
@@ -82,6 +97,12 @@ namespace VORP_BankServer
             Bank = bank;
             Time = time;
             Banco = banco;
+        }
+
+        public int GetCharacterId(Player source)
+        {
+            dynamic UserCharacter = Server.CORE.getUser(int.Parse(source.Handle)).getUsedCharacter;
+            return UserCharacter.charIdentifier;
         }
 
         public void RestTime()
@@ -109,15 +130,16 @@ namespace VORP_BankServer
             if(player1 != null){
                 //Aqui se hace la busqueda en base de datos para enviarsela
                 string identifier = "steam:" + player1.Identifiers["steam"];
-                dynamic result = await Exports["ghmattimysql"].executeSync("SELECT DATE_FORMAT(DATE, '%W %M %e %Y'),money,gold,reason,toIdentifier FROM transactions WHERE fromIdentifier = ? OR toIdentifier = ?",
-                    new object[] { identifier, identifier });
+                
+                dynamic result = await Exports["ghmattimysql"].executeSync("SELECT DATE_FORMAT(DATE, '%W %M %e %Y'),money,gold,reason,toIdentifier FROM transactions WHERE (fromIdentifier = ? OR toIdentifier = ?) AND (fromcharid = ? OR tocharid = ?)",
+                    new object[] { identifier, identifier, GetCharacterId(player1), GetCharacterId(player1) });
                 string str = JsonConvert.SerializeObject(result);
                 player1.TriggerEvent("vorp:refreshTransactions",str,identifier);
             }
             if(player2 != null){
                 string identifier = "steam:" + player2.Identifiers["steam"];
-                dynamic result = await Exports["ghmattimysql"].executeSync("SELECT DATE_FORMAT(DATE, '%W %M %e %Y'),money,gold,reason,toIdentifier FROM transactions WHERE fromIdentifier = ? OR toIdentifier = ?",
-                    new object[] { identifier, identifier });
+                dynamic result = await Exports["ghmattimysql"].executeSync("SELECT DATE_FORMAT(DATE, '%W %M %e %Y'),money,gold,reason,toIdentifier FROM transactions WHERE (fromIdentifier = ? OR toIdentifier = ?) AND (fromcharid = ? OR tocharid = ?)",
+                    new object[] { identifier, identifier, GetCharacterId(player2), GetCharacterId(player2) });
                 string str = JsonConvert.SerializeObject(result);
                 player2.TriggerEvent("vorp:refreshTransactions",str,identifier);
             }
@@ -125,8 +147,8 @@ namespace VORP_BankServer
 
         public async void MakeTransference()
         {
-            Exports["ghmattimysql"].execute("SELECT * FROM bank_users WHERE identifier = ? AND `name` = ?",
-            new object[] { ToIdentifier, Banco.Name },
+            Exports["ghmattimysql"].execute("SELECT * FROM bank_users WHERE identifier = ? AND charidentifier = ? AND `name` = ?",
+            new object[] { ToIdentifier, Banco.Name, ToCharId },
             new Action<dynamic>(async(result) =>
             {
                 if (result != null)
@@ -135,22 +157,22 @@ namespace VORP_BankServer
                     {
 
                         await Exports["ghmattimysql"].executeSync(
-                            "INSERT INTO bank_users (`name`,`identifier`,`money`,`gold`) VALUES (?,?,?,?)",
-                            new object[] { Bank, ToIdentifier, Money, Gold });
+                            "INSERT INTO bank_users (`name`,`identifier`,`charidentifier`,`money`,`gold`) VALUES (?,?,?,?,?)",
+                            new object[] { Bank, ToIdentifier, ToCharId, Money, Gold });
                             
                         await Exports["ghmattimysql"].executeSync(
-                            "INSERT INTO transactions (`bank`,`fromIdentifier`,`toIdentifier`,`money`,`gold`,`date`,`reason`,`bankto`) VALUES (?,?,?,?,?,CURDATE(),?,?)",
-                            new object[] { Bank, FromIdentifier, ToIdentifier, Money, Gold, Subject, BankTo });
+                            "INSERT INTO transactions (`bank`,`fromIdentifier`,`fromcharid`,`toIdentifier`,`tocharid`,`money`,`gold`,`date`,`reason`,`bankto`) VALUES (?,?,?,?,?,?,?,CURDATE(),?,?)",
+                            new object[] { Bank, FromIdentifier, FromCharId, ToIdentifier, ToCharId, Money, Gold, Subject, BankTo });
                            
                     }
                     else
                     {
                         await Exports["ghmattimysql"].executeSync(
-                            "UPDATE bank_users SET money = money+? , gold = gold+?  WHERE `identifier` = ? AND `name` = ?",
-                            new object[] { Money, Gold, ToIdentifier, Banco.Name });
+                            "UPDATE bank_users SET money = money+? , gold = gold+?  WHERE `identifier` = ? AND `charidentifier` = ? AND `name` = ?",
+                            new object[] { Money, Gold, ToIdentifier, ToCharId, Banco.Name });
                         await Exports["ghmattimysql"].executeSync(
-                            "INSERT INTO transactions (`bank`,`fromIdentifier`,`toIdentifier`,`money`,`gold`,`date`,`reason`,`bankto`) VALUES (?,?,?,?,?,CURDATE(),?,?)",
-                            new object[] { Bank, FromIdentifier, ToIdentifier, Money, Gold, Subject, BankTo });
+                            "INSERT INTO transactions (`bank`,`fromIdentifier`,`fromcharid`,`toIdentifier`,`tocharid`,`money`,`gold`,`date`,`reason`,`bankto`) VALUES (?,?,?,?,?,?,?,CURDATE(),?,?)",
+                            new object[] { Bank, FromIdentifier, FromCharId, ToIdentifier, ToCharId, Money, Gold, Subject, BankTo });
                     }
                     RefreshClientTransactions();
                 }

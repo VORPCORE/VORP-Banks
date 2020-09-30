@@ -57,7 +57,7 @@ namespace VORP_BankServer
             return UserCharacter.charIdentifier;
         }
 
-        public bool Transference(Player playerSend, string toSteamId, double gold, double money, bool instant, string subject)
+        public bool Transference(Player playerSend, string toSteamId, int charid, double gold, double money, bool instant, string subject)
         {
             string steam = "steam:" + playerSend.Identifiers["steam"];
             bool done = false;
@@ -65,7 +65,7 @@ namespace VORP_BankServer
             if (instant) auxmoney = money + LoadConfig.Config["transferenceCost"].ToObject<double>();
             if (_bankUsers[GetUserTuple(playerSend)].SubMoney(auxmoney) && _bankUsers[GetUserTuple(playerSend)].SubGold(gold))
             {
-                TransferenceC newTransference = new TransferenceC("steam:" + playerSend.Identifiers["steam"], toSteamId, money, gold, subject, Name, Name, LoadConfig.Config["time"].ToObject<int>(), this);
+                TransferenceC newTransference = new TransferenceC("steam:" + playerSend.Identifiers["steam"], GetCharacterId(playerSend), toSteamId, charid, money, gold, subject, Name, Name, LoadConfig.Config["time"].ToObject<int>(), this);
                 if (instant)
                 {
                     newTransference.MakeTransference();

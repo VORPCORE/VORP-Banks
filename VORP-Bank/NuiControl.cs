@@ -116,7 +116,8 @@ namespace VORP_Bank
                         JObject useraux = new JObject();
                         string resultname = user.firstname + " " + user.lastname;
                         useraux.Add("name", resultname);
-                        useraux.Add("steam", user.identifier);
+                        useraux.Add("steam", user.identifier); //Not Used
+                        useraux.Add("charid", user.charidentifier);
                         userList.Add(useraux);
                     }
                     sendData.Add("userList", userList);
@@ -131,13 +132,14 @@ namespace VORP_Bank
             {
                 JObject data = JObject.FromObject(obj);
                 string steamId = data["steam"].ToString();
+                int charid = data["charid"].ToObject<int>();
                 double money = double.Parse(data["money"].ToString());
                 double gold = double.Parse(data["gold"].ToString());
                 bool useInstantTax = data["instant"].ToObject<bool>();
                 string subject = data["subject"].ToString();
                 if(gold >= 0 && money >= 0)
                 {
-                    TriggerServerEvent("vorp:bankTrasference", steamId, money, gold, useInstantTax, Client.UsedBank, subject);
+                    TriggerServerEvent("vorp:bankTrasference", steamId, charid, money, gold, useInstantTax, Client.UsedBank, subject);
                 }               
             }
         }

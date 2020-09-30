@@ -244,13 +244,17 @@
                 var dollars = $('input[type=number][name=tmoneyinput]').val();
                 var golds = $('input[type=number][name=tgoldinput]').val();
                 var reason = $('input[type=text][name=reason]').val();
-                var steamID = $("#users").children("option:selected").val();
+                var values = JSON.parse($("#users").children("option:selected").val());
+                
                 var isInstant = document.getElementById("instantBox").checked;
+                
                 console.log(dollars)
                 console.log(golds)
                 console.log(reason)
                 console.log(isInstant)
-                console.log(steamID)
+                console.log(values.steam)
+                console.log(values.charid)
+
                 if (!dollars) {
                     dollars = "0";
                 }
@@ -258,7 +262,8 @@
                     golds = "0";
                 }
                 $.post("http://vorp_banks/Transfer", JSON.stringify({
-                    steam: steamID,
+                    steam: values.steam,
+                    charid: values.charid,
                     subject: reason,
                     money: dollars,
                     gold: golds,
@@ -305,10 +310,12 @@
                     } else if (data.action === "showUsers") {
                         $('#users').html("");
                         data.userList.forEach(element => {
-                            console.log(element.name);
-                            console.log(element.steam)
+                            var values = {
+                                steam: element.steam,
+                                charid: element.charid
+                            }
                             $("#users").append($('<option>', {
-                                value: element.steam,
+                                value: JSON.stringify(values),
                                 text: element.name
                             }));
                         });

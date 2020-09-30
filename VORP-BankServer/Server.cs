@@ -18,7 +18,7 @@ namespace VORP_BankServer
         {
             EventHandlers["vorp:bankDeposit"] += new Action<Player, string, double, double>(Deposit);
             EventHandlers["vorp:bankWithdraw"] += new Action<Player, string, double, double>(Withdraw);
-            EventHandlers["vorp:bankTrasference"] += new Action<Player, string, double, double, bool, string, string>(Transference);
+            EventHandlers["vorp:bankTrasference"] += new Action<Player, string, int, double, double, bool, string, string>(Transference);
             Delay(100);
             RegisterEvents();
             Tick += ExecuteTransaction;
@@ -34,11 +34,11 @@ namespace VORP_BankServer
             //}), false);
         }
 
-        private void Transference([FromSource] Player player, string toSteamId, double money, double gold, bool instantTak, string usedBank, string subject)
+        private void Transference([FromSource] Player player, string toSteamId, int tocharId, double money, double gold, bool instantTak, string usedBank, string subject)
         {
             if (Database.Banks.ContainsKey(usedBank))
             {
-                bool TransferenceResult = Database.Banks[usedBank].Transference(player, toSteamId, gold, money, instantTak, subject);
+                bool TransferenceResult = Database.Banks[usedBank].Transference(player, toSteamId, tocharId, gold, money, instantTak, subject);
                 if (!TransferenceResult && instantTak)
                 {
                     player.TriggerEvent("vorp:Tip", LoadConfig.Langs["InsuficientMoneyInstatnTrasference"], 2000);

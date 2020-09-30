@@ -5,7 +5,7 @@ using System;
 using System.Dynamic;
 using System.Threading.Tasks;
 using VORP_Bank;
-/*PROPERTY OF KLC_BY AVILILLA*/
+
 namespace VORP_BankClient
 {
     public class Client : BaseScript
