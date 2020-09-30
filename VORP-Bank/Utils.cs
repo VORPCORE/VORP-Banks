@@ -42,9 +42,11 @@ namespace VORP_Bank
 
         public static async void CreatePeds(JToken banks)
         {
-            foreach(JToken bank in banks)
+            await Delay(10000);
+            foreach (JToken bank in banks)
             {
                 uint HashPed = (uint)API.GetHashKey(bank["NPCModel"].ToString());
+                await LoadModel(HashPed); //Avililla if you not load model can spawn -_-
                 int _PedBank = API.CreatePed(HashPed, bank["npcCoords"]["x"].ToObject<float>(), bank["npcCoords"]["y"].ToObject<float>(),
                     bank["npcCoords"]["z"].ToObject<float>(), bank["npcCoords"]["h"].ToObject<float>(), false, true, true, true);
                 Function.Call((Hash)0x283978A15512B2FE, _PedBank, true);
@@ -56,6 +58,25 @@ namespace VORP_Bank
                 API.FreezeEntityPosition(_PedBank, true);
                 API.SetBlockingOfNonTemporaryEvents(_PedBank, true);
                 API.SetModelAsNoLongerNeeded(HashPed);
+            }
+        }
+
+        public static async Task<bool> LoadModel(uint hash)
+        {
+            if (Function.Call<bool>(Hash.IS_MODEL_VALID, hash))
+            {
+                Function.Call(Hash.REQUEST_MODEL, hash);
+                while (!Function.Call<bool>(Hash.HAS_MODEL_LOADED, hash))
+                {
+                    Debug.WriteLine($"Waiting for model {hash} load!");
+                    await Delay(100);
+                }
+                return true;
+            }
+            else
+            {
+                Debug.WriteLine($"Model {hash} is not valid!");
+                return false;
             }
         }
 
