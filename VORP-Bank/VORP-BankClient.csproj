@@ -32,8 +32,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CitizenFX.Core">
-      <HintPath>C:\Referencias\client\CitizenFX.Core.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\..\..\vorp api refences\Client\CitizenFX.Core.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\Newtonsoft.Json.dll</HintPath>

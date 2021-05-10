@@ -26,3 +26,10 @@ D:\VORP-Repos\VORP-Banks\VORP-Bank\obj\Debug\VORP-Bank.net.dll
 D:\VORP-Repos\VORP-Banks\VORP-Bank\obj\Debug\VORP-Bank.net.pdb
 D:\VORP-Repos\VORP-Banks\vorp_banks\VORP-Bank.net.dll
 D:\VORP-Repos\VORP-Banks\vorp_banks\VORP-Bank.net.pdb
+C:\Users\Tom\Desktop\vorp original\VORP-Banks\VORP-Bank\obj\Debug\VORP-BankClient.csprojAssemblyReference.cache
+C:\Users\Tom\Desktop\vorp original\VORP-Banks\VORP-Bank\obj\Debug\VORP-BankClient.csproj.CoreCompileInputs.cache
+C:\Users\Tom\Desktop\vorp original\VORP-Banks\VORP-Bank\obj\Debug\VORP-Bank.net.dll
+C:\Users\Tom\Desktop\vorp original\VORP-Banks\VORP-Bank\obj\Debug\VORP-Bank.net.pdb
+C:\Users\Tom\Desktop\vorp original\VORP-Banks\vorp_banks\VORP-Bank.net.dll
+C:\Users\Tom\Desktop\vorp original\VORP-Banks\vorp_banks\VORP-Bank.net.pdb
+C:\Users\Tom\Desktop\vorp original\VORP-Banks\VORP-Bank\obj\Debug\VORP-BankClient.csproj.CopyComplete

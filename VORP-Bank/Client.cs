@@ -37,7 +37,7 @@ namespace VORP_BankClient
             foreach (JToken util in GetConfig.Config["Banks"])
             {
                 if (API.GetDistanceBetweenCoords(util["coords"]["x"].ToObject<float>(), util["coords"]["y"].ToObject<float>(), util["coords"]["z"].ToObject<float>(), playerCoords.X,
-                    playerCoords.Y, playerCoords.Z, false) <= 1.0f)
+                    playerCoords.Y, playerCoords.Z, true) <= 1.0f)
                 {
                     await Utils.DrawTxt(GetConfig.Langs["Interaction"], 0.5f, 0.9f, 0.7f, 0.7f, 255, 255, 255, 255,
                         true, true);
